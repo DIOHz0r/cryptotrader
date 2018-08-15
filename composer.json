@@ -1,62 +1,77 @@
 {
-    "type": "project",
-    "license": "proprietary",
-    "require": {
-        "php": "^7.1.3",
-        "ext-iconv": "*",
-        "guzzlehttp/guzzle": "^6.3",
-        "symfony/console": "^4.0",
-        "symfony/flex": "^1.0",
-        "symfony/framework-bundle": "^4.0",
-        "symfony/lts": "^4@dev",
-        "symfony/yaml": "^4.0"
-    },
-    "require-dev": {
-        "sensiolabs/security-checker": "^4.1",
-        "symfony/dotenv": "^4.0"
-    },
-    "config": {
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "App\\Tests\\": "tests/"
-        }
-    },
-    "replace": {
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php71": "*",
-        "symfony/polyfill-php70": "*",
-        "symfony/polyfill-php56": "*"
-    },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
-            "security-checker security:check": "script"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ]
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "id": "01CB8RTGZH0WKKBCME06NJXSZH",
-            "allow-contrib": false
-        }
+  "name": "diohz0r/cryptotrader",
+  "description": "Cli-command to find trades for cryptocurrencies",
+  "keywords": [
+    "localbitcoin",
+    "uphold"
+  ],
+  "type": "project",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Domingo Oropeza",
+      "email": "dioh_@hotmail.com",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "php": "^7.1.3",
+    "ext-iconv": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6.3",
+    "symfony/console": "^4.0",
+    "symfony/flex": "^1.0",
+    "symfony/framework-bundle": "^4.0",
+    "symfony/lts": "^4@dev",
+    "symfony/yaml": "^4.0"
+  },
+  "require-dev": {
+    "sensiolabs/security-checker": "^4.1",
+    "symfony/dotenv": "^4.0"
+  },
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "App\\Tests\\": "tests/"
+    }
+  },
+  "replace": {
+    "symfony/polyfill-iconv": "*",
+    "symfony/polyfill-php71": "*",
+    "symfony/polyfill-php70": "*",
+    "symfony/polyfill-php56": "*"
+  },
+  "scripts": {
+    "auto-scripts": {
+      "cache:clear": "symfony-cmd",
+      "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
+      "security-checker security:check": "script"
+    },
+    "post-install-cmd": [
+      "@auto-scripts"
+    ],
+    "post-update-cmd": [
+      "@auto-scripts"
+    ]
+  },
+  "conflict": {
+    "symfony/symfony": "*"
+  },
+  "extra": {
+    "symfony": {
+      "id": "01CB8RTGZH0WKKBCME06NJXSZH",
+      "allow-contrib": false
+    }
+  }
 }
