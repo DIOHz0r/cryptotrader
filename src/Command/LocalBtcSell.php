@@ -39,12 +39,13 @@ class LocalBtcSell extends Command
             ->setHelp('Returns the online sells ads from localbitcoin.')
             ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
             ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
+            ->addOption('currency', 'c', InputOption::VALUE_REQUIRED, 'Currency ISO code', 'USD')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $currency = 'VEF';
+        $currency = $input->getOption('currency');
         $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json';
         $options['amount'] = $input->getOption('amount');
         $options['bank'] = $input->getOption('bank');
