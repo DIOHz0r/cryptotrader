@@ -89,7 +89,9 @@ class LocalBtcSell extends Command
             $mark = ' ';
             $data = $ad['data'];
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
-            if ($amount && ((int)$data['min_amount'] <= $amount)) {
+            $minAmount = (float) $data['min_amount'];
+            $maxAmount = (float) $data['max_amount'];
+            if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
                 $mark .= '$';
             }
             if (stripos($bankName, $options['bank']) !== false) {
@@ -99,8 +101,8 @@ class LocalBtcSell extends Command
                 $data['profile']['name'],
                 $bankName,
                 $data['temp_price'],
-                $data['min_amount'],
-                $data['max_amount'],
+                $minAmount,
+                $maxAmount,
                 $ad['actions']['public_view'].$mark,
             ];
         }
