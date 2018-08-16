@@ -27,6 +27,11 @@ class LocalBtcClient
     private $httpClient;
 
     /**
+     * @var array
+     */
+    private $options = [];
+
+    /**
      * Constructor.
      *
      * @param array $options LocalbitcoinClient options.
@@ -93,5 +98,56 @@ class LocalBtcClient
     public function setHttpClient(HttpClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
+    }
+
+    /**
+     * @param $queryUrl
+     * @param array $options
+     * @return array
+     */
+    public function listAds($queryUrl, array $options): array
+    {
+        $response = $this->httpClient->get($queryUrl);
+        $contents = json_decode($response->getBody()->getContents(), true);
+        $dataRows = [];
+        if (!$contents) {
+            return $dataRows;
+        }
+        $amount = $options['amount'];
+        foreach ($contents['data']['ad_list'] as $key => $ad) {
+            $mark = ' ';
+            $skip = true;
+            $data = $ad['data'];
+            $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
+            $minAmount = (float) $data['min_amount'];
+            $maxAmount = (float) $data['max_amount'];
+            if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
+                $mark .= '$';
+                $skip = false;
+            }
+            $matchBankname = str_replace(' ', '', $bankName);
+            if (stripos($matchBankname, $options['bank']) !== false) {
+                $mark .= '+';
+            }
+            $row = [
+                $bankName,
+                $data['temp_price'],
+                $minAmount,
+                $maxAmount,
+                $ad['actions']['public_view'].$mark,
+            ];
+            if ($options['username']) {
+                $row[] = $data['profile']['name'];
+            }
+            if ($skip && $options['exclude']) {
+                continue;
+            }
+            $dataRows[] = $row;
+        }
+        if (isset($contents['pagination']['next'])) {
+            $dataRows = array_merge($dataRows, $this->listAds($contents['pagination']['next'], $options));
+        }
+
+        return $dataRows;
     }
 }
