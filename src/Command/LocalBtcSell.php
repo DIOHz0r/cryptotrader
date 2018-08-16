@@ -12,6 +12,7 @@ use App\HttpClient\HttpClient;
 use App\LocalBtc\LocalBtcClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,9 +53,9 @@ class LocalBtcSell extends Command
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Returns the online sells ads from localbitcoin.')
+            ->addArgument('currency', InputArgument::REQUIRED, 'Currency ISO code')
             ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
             ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
-            ->addOption('currency', 'c', InputOption::VALUE_REQUIRED, 'Currency ISO code', 'USD')
             ->addOption(
                 'exclude',
                 'x',
@@ -73,8 +74,9 @@ class LocalBtcSell extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $currency = $input->getOption('currency');
-        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json';
+        $currency = $input->getArgument('currency');
+        $fields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
+        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$fields;
         $options['username'] = $input->getOption('username');
         $options['exclude'] = $input->getOption('exclude');
         $options['amount'] = $input->getOption('amount');
