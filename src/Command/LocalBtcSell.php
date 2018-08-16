@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LocalBtcSell extends Command
 {
     /**
-     * @var HttpClient
+     * @var LocalBtcClient
      */
     protected $client;
 
@@ -34,9 +34,9 @@ class LocalBtcSell extends Command
         'max' => 3,
     ];
 
-    public function __construct(HttpClient $client)
+    public function __construct(LocalBtcClient $localBtcClient)
     {
-        $this->client = $client;
+        $this->client = $localBtcClient;
         parent::__construct();
     }
 
@@ -74,24 +74,29 @@ class LocalBtcSell extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Get arguments and options
         $currency = $input->getArgument('currency');
-        $fields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
-        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$fields;
+        $top = $input->getOption('top');
         $options['username'] = $input->getOption('username');
         $options['exclude'] = $input->getOption('exclude');
         $options['amount'] = $input->getOption('amount');
         $options['bank'] = $input->getOption('bank');
-        $dataRows = $this->listAds($queryUrl, $options);
+
+        // Request end-point
+        $fields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
+        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$fields;
+        $dataRows = $this->client->listAds($queryUrl, $options);
         if (!$dataRows) {
             $output->writeln('No results found.');
 
             return;
         }
+
+        // Process result
         $price = array_column($dataRows, $this->tableColums['price']);
         $minimun = array_column($dataRows, $this->tableColums['min']);
         $maximun = array_column($dataRows, $this->tableColums['max']);
         array_multisort($price, SORT_ASC, $minimun, SORT_DESC, $maximun, SORT_DESC, $dataRows);
-        $top = $input->getOption('top');
         if ($top > 0 && count($dataRows) > $top) {
             $dataRows = array_slice($dataRows, (-1 * $top));
         }
@@ -102,6 +107,8 @@ class LocalBtcSell extends Command
             }
             $dataRows[$key] = $row;
         }
+
+        // Print the result
         $table = new Table($output);
         $headers = ['payment', 'price', 'min', 'max', 'url'];
         if ($options['username']) {
@@ -109,56 +116,5 @@ class LocalBtcSell extends Command
         }
         $table->setHeaders($headers)->setRows($dataRows);
         $table->render();
-    }
-
-    /**
-     * @param $queryUrl
-     * @param array $options
-     * @return array
-     */
-    protected function listAds($queryUrl, array $options): array
-    {
-        $response = $this->client->get($queryUrl);
-        $contents = json_decode($response->getBody()->getContents(), true);
-        $dataRows = [];
-        if (!$contents) {
-            return $dataRows;
-        }
-        $amount = $options['amount'];
-        foreach ($contents['data']['ad_list'] as $key => $ad) {
-            $mark = ' ';
-            $skip = true;
-            $data = $ad['data'];
-            $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
-            $minAmount = (float) $data['min_amount'];
-            $maxAmount = (float) $data['max_amount'];
-            if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
-                $mark .= '$';
-                $skip = false;
-            }
-            $matchBankname = str_replace(' ', '', $bankName);
-            if (stripos($matchBankname, $options['bank']) !== false) {
-                $mark .= '+';
-            }
-            $row = [
-                $bankName,
-                $data['temp_price'],
-                $minAmount,
-                $maxAmount,
-                $ad['actions']['public_view'].$mark,
-            ];
-            if ($options['username']) {
-                $row[] = $data['profile']['name'];
-            }
-            if ($skip && $options['exclude']) {
-                continue;
-            }
-            $dataRows[] = $row;
-        }
-        if (isset($contents['pagination']['next'])) {
-            $dataRows = array_merge($dataRows, $this->listAds($contents['pagination']['next'], $options));
-        }
-
-        return $dataRows;
     }
 }
