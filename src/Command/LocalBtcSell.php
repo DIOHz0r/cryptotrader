@@ -19,7 +19,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LocalBtcSell extends Command
 {
+    /**
+     * @var HttpClient
+     */
     protected $client;
+
+    /**
+     * @var array
+     */
+    private $tableColums = [
+        'price' => 1,
+        'min' => 2,
+        'max' => 3,
+    ];
 
     public function __construct(HttpClient $client)
     {
@@ -27,6 +39,9 @@ class LocalBtcSell extends Command
         parent::__construct();
     }
 
+    /**
+     * Configuration of the command
+     */
     protected function configure()
     {
         $this
@@ -40,13 +55,28 @@ class LocalBtcSell extends Command
             ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
             ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
             ->addOption('currency', 'c', InputOption::VALUE_REQUIRED, 'Currency ISO code', 'USD')
+            ->addOption(
+                'exclude',
+                'x',
+                InputOption::VALUE_NONE,
+                'Exclude other ads not related to the searched ammount'
+            )
+            ->addOption('username', 'u', InputOption::VALUE_NONE, 'Show username and reputation')
+            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0)
         ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $currency = $input->getOption('currency');
         $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json';
+        $options['username'] = $input->getOption('username');
+        $options['exclude'] = $input->getOption('exclude');
         $options['amount'] = $input->getOption('amount');
         $options['bank'] = $input->getOption('bank');
         $dataRows = $this->listAds($queryUrl, $options);
@@ -55,19 +85,27 @@ class LocalBtcSell extends Command
 
             return;
         }
-        $price = array_column($dataRows, 2);
-        $minimun = array_column($dataRows, 3);
-        $maximun = array_column($dataRows, 4);
+        $price = array_column($dataRows, $this->tableColums['price']);
+        $minimun = array_column($dataRows, $this->tableColums['min']);
+        $maximun = array_column($dataRows, $this->tableColums['max']);
         array_multisort($price, SORT_ASC, $minimun, SORT_DESC, $maximun, SORT_DESC, $dataRows);
+        $top = $input->getOption('top');
+        if ($top > 0 && count($dataRows) > $top) {
+            $dataRows = array_slice($dataRows, (-1 * $top));
+        }
         $fmt = new \NumberFormatter($currency, \NumberFormatter::CURRENCY);
         foreach ($dataRows as $key => $row){
-            foreach ([2, 3, 4] as $colNumber){
+            foreach ($this->tableColums as $colName => $colNumber){
                 $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $currency);
             }
             $dataRows[$key] = $row;
         }
         $table = new Table($output);
-        $table->setHeaders(['user', 'payment', 'price', 'min', 'max', 'url',])->setRows($dataRows);
+        $headers = ['payment', 'price', 'min', 'max', 'url'];
+        if ($options['username']) {
+            $headers[] = 'user';
+        }
+        $table->setHeaders($headers)->setRows($dataRows);
         $table->render();
     }
 
@@ -87,24 +125,33 @@ class LocalBtcSell extends Command
         $amount = $options['amount'];
         foreach ($contents['data']['ad_list'] as $key => $ad) {
             $mark = ' ';
+            $skip = true;
             $data = $ad['data'];
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
             $minAmount = (float) $data['min_amount'];
             $maxAmount = (float) $data['max_amount'];
             if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
                 $mark .= '$';
+                $skip = false;
             }
-            if (stripos($bankName, $options['bank']) !== false) {
+            $matchBankname = str_replace(' ', '', $bankName);
+            if (stripos($matchBankname, $options['bank']) !== false) {
                 $mark .= '+';
             }
-            $dataRows[] = [
-                $data['profile']['name'],
+            $row = [
                 $bankName,
                 $data['temp_price'],
                 $minAmount,
                 $maxAmount,
                 $ad['actions']['public_view'].$mark,
             ];
+            if ($options['username']) {
+                $row[] = $data['profile']['name'];
+            }
+            if ($skip && $options['exclude']) {
+                continue;
+            }
+            $dataRows[] = $row;
         }
         if (isset($contents['pagination']['next'])) {
             $dataRows = array_merge($dataRows, $this->listAds($contents['pagination']['next'], $options));
