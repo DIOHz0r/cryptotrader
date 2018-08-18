@@ -8,43 +8,19 @@
 namespace App\Command;
 
 
-use App\HttpClient\HttpClient;
 use App\LocalBtc\LocalBtcClient;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class LocalBtcSell extends Command
+class LocalBtcSell extends LocalBtcCommand
 {
-    /**
-     * @var LocalBtcClient
-     */
-    protected $client;
 
-    /**
-     * @var array
-     */
-    private $tableColums = [
-        'price' => 1,
-        'min' => 2,
-        'max' => 3,
-    ];
-
-    public function __construct(LocalBtcClient $localBtcClient)
-    {
-        $this->client = $localBtcClient;
-        parent::__construct();
-    }
-
-    /**
-     * Configuration of the command
-     */
     protected function configure()
     {
+        parent::configure();
         $this
             // the name of the command (the part after "bin/console")
             ->setName('localbtc:sell:online')
@@ -54,16 +30,6 @@ class LocalBtcSell extends Command
             // the "--help" option
             ->setHelp('Returns the online sells ads from localbitcoin.')
             ->addArgument('currency', InputArgument::REQUIRED, 'Currency ISO code')
-            ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
-            ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
-            ->addOption(
-                'exclude',
-                'x',
-                InputOption::VALUE_NONE,
-                'Exclude other ads not related to the searched ammount'
-            )
-            ->addOption('username', 'u', InputOption::VALUE_NONE, 'Show username and reputation')
-            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0)
         ;
     }
 
@@ -83,8 +49,7 @@ class LocalBtcSell extends Command
         $options['bank'] = $input->getOption('bank');
 
         // Request end-point
-        $fields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
-        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$fields;
+        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$this->defaultFields;
         $dataRows = $this->client->listAds($queryUrl, $options);
         if (!$dataRows) {
             $output->writeln('No results found.');
@@ -93,20 +58,7 @@ class LocalBtcSell extends Command
         }
 
         // Process result
-        $price = array_column($dataRows, $this->tableColums['price']);
-        $minimun = array_column($dataRows, $this->tableColums['min']);
-        $maximun = array_column($dataRows, $this->tableColums['max']);
-        array_multisort($price, SORT_ASC, $minimun, SORT_DESC, $maximun, SORT_DESC, $dataRows);
-        if ($top > 0 && count($dataRows) > $top) {
-            $dataRows = array_slice($dataRows, (-1 * $top));
-        }
-        $fmt = new \NumberFormatter($currency, \NumberFormatter::CURRENCY);
-        foreach ($dataRows as $key => $row){
-            foreach ($this->tableColums as $colName => $colNumber){
-                $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $currency);
-            }
-            $dataRows[$key] = $row;
-        }
+        $dataRows = $this->processDataRows($dataRows, $top, $currency);
 
         // Print the result
         $table = new Table($output);
@@ -117,4 +69,5 @@ class LocalBtcSell extends Command
         $table->setHeaders($headers)->setRows($dataRows);
         $table->render();
     }
+
 }
