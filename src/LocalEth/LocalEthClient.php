@@ -150,7 +150,7 @@ class LocalEthClient
                 'https://localethereum.com/offer/'.$ad['id'].$mark,
             ];
             if ($options['username']) {
-                $row[] = $ad['account_username'];
+                $row[] = $ad['account_username'] . ' ('.$ad['account_intro'].')';
             }
             $row['local_currency_code'] = $ad['local_currency_code'];
             $row['country_code'] = $ad['city']['country_code'];
