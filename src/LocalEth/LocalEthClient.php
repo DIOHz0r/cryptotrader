@@ -144,7 +144,7 @@ class LocalEthClient
             }
             $row = [
                 $bankName,
-                $ad['price']['amount'],
+                $ad['price']['amount_including_taker_fee'],
                 $minAmount,
                 $maxAmount,
                 'https://localethereum.com/offer/'.$ad['id'].$mark,
