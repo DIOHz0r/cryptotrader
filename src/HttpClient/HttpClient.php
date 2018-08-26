@@ -21,8 +21,6 @@ namespace App\HttpClient;
 
 use App\HttpClient\Handler\ErrorHandler;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\ClientInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
 class HttpClient implements HttpClientInterface
