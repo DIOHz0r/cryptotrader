@@ -19,7 +19,6 @@
 
 namespace App\LocalEth;
 
-use App\Exception\AuthenticationRequiredException;
 use App\HttpClient\HttpClient;
 use App\HttpClient\HttpClientInterface;
 
