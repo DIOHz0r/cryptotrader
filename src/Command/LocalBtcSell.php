@@ -73,6 +73,13 @@ class LocalBtcSell extends LocalBtcCommand
         $dataRows = $this->processDataRows($dataRows, $top, $currency);
 
         // Print the result
+        $format = $input->getOption('json');
+        if ($format) {
+            $output->write(json_encode($dataRows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+
+            return;
+        }
+
         $table = new Table($output);
         $headers = ['payment', 'price', 'min', 'max', 'url'];
         if ($options['username']) {
