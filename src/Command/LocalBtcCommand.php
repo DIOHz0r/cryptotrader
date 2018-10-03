@@ -59,6 +59,7 @@ class LocalBtcCommand extends Command
         $this
             ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
             ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
+            ->addOption('json', 'j', InputOption::VALUE_NONE, 'Prin the result as json string')
             ->addOption(
                 'exclude',
                 'x',
