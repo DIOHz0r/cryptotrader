@@ -33,7 +33,7 @@ class MessageFactory
      *
      * @return Response
      */
-    public function createResponse($statusCode, array $headers = array(), $body = null, array $options = array())
+    public function createResponse($statusCode, array $headers = [], $body = null, array $options = [])
     {
         if (null !== $body) {
             $body = Stream::create($body);

@@ -47,7 +47,7 @@ class LocalBtcClient
      *
      * @param array $options LocalbitcoinClient options.
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         if (!isset($options['base_url'])) {
             $options['base_url'] = isset($options['sandbox']) && $options['sandbox'] ? self::SANDBOX_API_URL : self::API_URL;
@@ -78,6 +78,7 @@ class LocalBtcClient
         if (!isset($this->options[$name])) {
             return null;
         }
+
         return $this->options[$name];
     }
 
@@ -91,8 +92,10 @@ class LocalBtcClient
     public function setOption($name, $value)
     {
         $this->options[$name] = $value;
+
         return $this;
     }
+
     /**
      * Get all client options.
      *
@@ -130,8 +133,8 @@ class LocalBtcClient
             $skip = true;
             $data = $ad['data'];
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
-            $minAmount = (float) $data['min_amount'];
-            $maxAmount = (float) $data['max_amount'];
+            $minAmount = (float)$data['min_amount'];
+            $maxAmount = (float)$data['max_amount'];
             if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
                 $mark .= '$';
                 $skip = false;

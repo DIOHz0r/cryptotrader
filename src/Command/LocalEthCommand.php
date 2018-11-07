@@ -75,8 +75,11 @@ class LocalEthCommand extends Command
      * @param array $sort
      * @return array
      */
-    protected function processDataRows(array $dataRows, $top, $sort = ['price_sort'=> SORT_ASC, 'min_max_sort'=> SORT_DESC]): array
-    {
+    protected function processDataRows(
+        array $dataRows,
+        $top,
+        $sort = ['price_sort' => SORT_ASC, 'min_max_sort' => SORT_DESC]
+    ): array {
         $price = array_column($dataRows, $this->tableColums['price']);
         $minimun = array_column($dataRows, $this->tableColums['min']);
         $maximun = array_column($dataRows, $this->tableColums['max']);
@@ -93,7 +96,7 @@ class LocalEthCommand extends Command
             $dataRows = array_slice($dataRows, (-1 * $top));
         }
         foreach ($dataRows as $key => $row) {
-            $fmt = new \NumberFormatter('und_' .$row['country_code'], \NumberFormatter::CURRENCY);
+            $fmt = new \NumberFormatter('und_'.$row['country_code'], \NumberFormatter::CURRENCY);
             foreach ($this->tableColums as $colName => $colNumber) {
                 $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $row['local_currency_code']);
             }
