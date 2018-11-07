@@ -30,11 +30,11 @@ class Response extends BaseResponse
      */
     public function getApiRateLimit()
     {
-        return array(
+        return [
             'limit' => (string)$this->getHeader('Rate-Limit-Total'),
             'remaining' => (string)$this->getHeader('Rate-Limit-Remaining'),
             'reset' => (string)$this->getHeader('Rate-Limit-Reset'),
-        );
+        ];
     }
 
     /**
@@ -64,14 +64,14 @@ class Response extends BaseResponse
         if (!$contentRange) {
             return null;
         }
-        $matches = array();
+        $matches = [];
         preg_match('/^.*\ (\d*)-(\d*)\/(\d*)$/', $contentRange, $matches);
 
-        return array(
+        return [
             'count' => (int)$matches[3],
             'end' => (int)$matches[2],
             'start' => (int)$matches[1],
-        );
+        ];
     }
 
     /**

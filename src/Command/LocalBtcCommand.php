@@ -79,8 +79,12 @@ class LocalBtcCommand extends Command
      * @param array $sort
      * @return array
      */
-    protected function processDataRows(array $dataRows, $top, $currency, $sort = ['price_sort'=> SORT_ASC, 'min_max_sort'=> SORT_DESC]): array
-    {
+    protected function processDataRows(
+        array $dataRows,
+        $top,
+        $currency,
+        $sort = ['price_sort' => SORT_ASC, 'min_max_sort' => SORT_DESC]
+    ): array {
         $price = array_column($dataRows, $this->tableColums['price']);
         $minimun = array_column($dataRows, $this->tableColums['min']);
         $maximun = array_column($dataRows, $this->tableColums['max']);

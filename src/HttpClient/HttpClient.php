@@ -40,14 +40,14 @@ class HttpClient implements HttpClientInterface
     /**
      * @var $options
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Constructor.
      *
      * @param array $options
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->options = array_merge(
             $this->options,
@@ -58,32 +58,32 @@ class HttpClient implements HttpClientInterface
         $this->errorHandler = new ErrorHandler($this->options);
     }
 
-    public function get($path, array $parameters = array(), array $headers = array())
+    public function get($path, array $parameters = [], array $headers = [])
     {
         return $this->request($path, null, 'GET', $headers);
     }
 
-    public function post($path, $body = null, array $headers = array())
+    public function post($path, $body = null, array $headers = [])
     {
         return $this->request($path, $body, 'POST', $headers);
     }
 
-    public function patch($path, $body = null, array $headers = array())
+    public function patch($path, $body = null, array $headers = [])
     {
         return $this->request($path, $body, 'PATCH', $headers);
     }
 
-    public function put($path, $body, array $headers = array())
+    public function put($path, $body, array $headers = [])
     {
         return $this->request($path, $body, 'PUT', $headers);
     }
 
-    public function delete($path, $body = null, array $headers = array())
+    public function delete($path, $body = null, array $headers = [])
     {
         return $this->request($path, $body, 'DELETE', $headers);
     }
 
-    public function request($path, $body, $httpMethod = 'GET', array $headers = array())
+    public function request($path, $body, $httpMethod = 'GET', array $headers = [])
     {
         if (!empty($this->options['debug'])) {
             $options['debug'] = $this->options['debug'];

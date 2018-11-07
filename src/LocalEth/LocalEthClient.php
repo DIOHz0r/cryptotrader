@@ -47,7 +47,7 @@ class LocalEthClient
      *
      * @param array $options LocalethereumClient options.
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         if (!isset($options['base_url'])) {
             $options['base_url'] = isset($options['sandbox']) && $options['sandbox'] ? self::SANDBOX_API_URL : self::API_URL;
@@ -78,6 +78,7 @@ class LocalEthClient
         if (!isset($this->options[$name])) {
             return null;
         }
+
         return $this->options[$name];
     }
 
@@ -91,8 +92,10 @@ class LocalEthClient
     public function setOption($name, $value)
     {
         $this->options[$name] = $value;
+
         return $this;
     }
+
     /**
      * Get all client options.
      *
@@ -132,8 +135,8 @@ class LocalEthClient
                 continue;
             }
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $ad['headline']);
-            $minAmount = (float) $ad['limits_minimum'];
-            $maxAmount = (float) $ad['limits_maximum'];
+            $minAmount = (float)$ad['limits_minimum'];
+            $maxAmount = (float)$ad['limits_maximum'];
             if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
                 $mark .= '$';
                 $skip = false;
@@ -150,7 +153,7 @@ class LocalEthClient
                 'https://localethereum.com/offer/'.$ad['id'].$mark,
             ];
             if ($options['username']) {
-                $row[] = $ad['account_username'] . ' ('.$ad['account_intro'].')';
+                $row[] = $ad['account_username'].' ('.$ad['account_intro'].')';
             }
             $row['local_currency_code'] = $ad['local_currency_code'];
             $row['country_code'] = $ad['city']['country_code'];
