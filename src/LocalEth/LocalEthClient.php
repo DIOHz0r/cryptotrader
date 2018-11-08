@@ -138,12 +138,12 @@ class LocalEthClient
             $minAmount = (float)$ad['limits_minimum'];
             $maxAmount = (float)$ad['limits_maximum'];
             if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
-                $mark .= '$';
+                $mark .= '<info>$</info>';
                 $skip = false;
             }
             $matchBankname = str_replace(' ', '', $bankName);
             if (stripos($matchBankname, $options['bank']) !== false) {
-                $mark .= '+';
+                $mark .= '<fg=cyan>+</>';
             }
             $row = [
                 $bankName,
@@ -152,12 +152,12 @@ class LocalEthClient
                 $maxAmount,
                 'https://localethereum.com/offer/'.$ad['id'].$mark,
             ];
-            if ($options['username']) {
+            if (isset($options['username']) && $options['username']) {
                 $row[] = $ad['account_username'].' ('.$ad['account_intro'].')';
             }
             $row['local_currency_code'] = $ad['local_currency_code'];
             $row['country_code'] = $ad['city']['country_code'];
-            if ($skip && $options['exclude']) {
+            if ($skip && isset($options['exclude']) && $options['exclude']) {
                 continue;
             }
             $dataRows[] = $row;
