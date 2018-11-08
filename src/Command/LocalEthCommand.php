@@ -22,6 +22,8 @@ namespace App\Command;
 
 use App\LocalEth\LocalEthClient;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputOption;
 
 class LocalEthCommand extends Command
@@ -95,15 +97,19 @@ class LocalEthCommand extends Command
         if ($top > 0 && count($dataRows) > $top) {
             $dataRows = array_slice($dataRows, (-1 * $top));
         }
+        $finalData = [];
         foreach ($dataRows as $key => $row) {
             $fmt = new \NumberFormatter('und_'.$row['country_code'], \NumberFormatter::CURRENCY);
             foreach ($this->tableColums as $colName => $colNumber) {
                 $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $row['local_currency_code']);
             }
-            unset($row['local_currency_code'], $row['country_code']);
-            $dataRows[$key] = $row;
+            $finalData[] = [$row[0], $row[1], $row[2], $row[3]];
+            $finalData[] = new TableSeparator();
+            $finalData[] = [new TableCell($row[4], ['colspan' => 5])];
+            $finalData[] = new TableSeparator();
         }
+        array_pop($finalData); // remove last separator
 
-        return $dataRows;
+        return $finalData;
     }
 }

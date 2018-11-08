@@ -22,6 +22,8 @@ namespace App\Command;
 
 use App\LocalBtc\LocalBtcClient;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputOption;
 
 class LocalBtcCommand extends Command
@@ -100,14 +102,19 @@ class LocalBtcCommand extends Command
         if ($top > 0 && count($dataRows) > $top) {
             $dataRows = array_slice($dataRows, (-1 * $top));
         }
+        $finalData = [];
         $fmt = new \NumberFormatter($currency, \NumberFormatter::CURRENCY);
         foreach ($dataRows as $key => $row) {
             foreach ($this->tableColums as $colName => $colNumber) {
                 $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $currency);
             }
-            $dataRows[$key] = $row;
+            $finalData[] = [$row[0], $row[1], $row[2], $row[3]];
+            $finalData[] = new TableSeparator();
+            $finalData[] = [new TableCell($row[4], ['colspan' => 5])];
+            $finalData[] = new TableSeparator();
         }
+        array_pop($finalData); // remove last separator
 
-        return $dataRows;
+        return $finalData;
     }
 }
