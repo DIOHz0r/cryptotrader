@@ -85,7 +85,7 @@ class LocalEthBuy extends LocalEthCommand
         }
 
         $table = new Table($output);
-        $headers = ['payment', 'price', 'min', 'max', 'url'];
+        $headers = ['payment', 'price', 'min', 'max'];
         if ($options['username']) {
             $headers[] = 'user';
         }
