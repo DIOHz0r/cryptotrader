@@ -31,6 +31,7 @@ class UpholdClient
      */
     const UPHOLD_API_URL = 'https://api.uphold.com';
     const UPHOLD_SANDBOX_API_URL = 'https://api-sandbox.uphold.com';
+    protected $options = [];
 
     /**
      * Guzzle instance used to communicate with Uphold.
@@ -42,9 +43,9 @@ class UpholdClient
     /**
      * Constructor.
      *
-     * @param Array $options UpholdClient options.
+     * @param array $options UpholdClient options.
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         if (!isset($options['base_url'])) {
             $options['base_url'] = isset($options['sandbox']) && $options['sandbox'] ? self::UPHOLD_SANDBOX_API_URL : self::UPHOLD_API_URL;
@@ -75,6 +76,7 @@ class UpholdClient
         if (!isset($this->options[$name])) {
             return null;
         }
+
         return $this->options[$name];
     }
 
@@ -88,8 +90,10 @@ class UpholdClient
     public function setOption($name, $value)
     {
         $this->options[$name] = $value;
+
         return $this;
     }
+
     /**
      * Get all client options.
      *
@@ -109,109 +113,6 @@ class UpholdClient
     }
 
     /**
-     * Retrieve all available currencies.
-     *
-     * @return array
-     */
-    public function getCurrencies()
-    {
-        $rates = $this->getRates();
-        return array_reduce($rates, function($currencies, $rate) {
-            if (in_array($rate->getCurrency(), $currencies)) {
-                return $currencies;
-            }
-            $currencies[] = $rate->getCurrency();
-            return $currencies;
-        }, array());
-    }
-
-    /**
-     * Retrieve all exchanges rates for all currency pairs.
-     *
-     * @return array
-     */
-    public function getRates()
-    {
-        $response = $this->get('/ticker');
-        return array_map(function($rate) {
-            return new Rate($this,($rate));
-        }, $response->getContent());
-    }
-    /**
-     * Retrieve all exchanges rates relative to a given currency.
-     *
-     * @param string $currency The filter currency.
-     *
-     * @return array
-     */
-    public function getRatesByCurrency($currency)
-    {
-        $response = $this->get(sprintf('/ticker/%s', rawurlencode($currency)));
-        return array_map(function($rate) {
-            return new Rate($this, $rate);
-        }, $response->getContent());
-    }
-
-    /**
-     * Create a new Personal Access Token (PAT).
-     *
-     * @param string $login Login email or username.
-     * @param string $password Password.
-     * @param string $description PAT description.
-     * @param string $otp Verification code
-     *
-     * @return array
-     */
-    public function createToken($login, $password, $description, $otp = null)
-    {
-        $headers = array_merge($this->getDefaultHeaders(), array(
-            'Authorization' => sprintf('Basic %s', base64_encode(sprintf('%s:%s', $login, $password))),
-            'OTP-Token' => $otp,
-        ));
-        $response = $this->post('/me/tokens',
-            array('description' => $description),
-            $headers
-        );
-        return $response->getContent();
-    }
-
-    /**
-     * Authorize user via Uphold Connect.
-     *
-     * @param string $code The code parameter that is passed via the Uphold Connect callback url.
-     *
-     * @return User
-     * @throws AuthenticationRequiredException
-     */
-    public function authorizeUser($code)
-    {
-        $clientId = $this->getOption('client_id');
-        $clientSecret = $this->getOption('client_secret');
-        if (!$clientId) {
-            throw new AuthenticationRequiredException('Missing `client_id` option');
-        }
-        if (!$clientSecret) {
-            throw new AuthenticationRequiredException('Missing `client_secret` option');
-        }
-        $headers = array(
-            'Accept' => 'application/x-www-form-urlencoded',
-            'Authorization' => sprintf('Basic %s', base64_encode(sprintf('%s:%s', $clientId, $clientSecret))),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        );
-        $parameters = http_build_query(array(
-            'code' => $code,
-            'grant_type' => 'authorization_code',
-        ));
-        $response = $this->getHttpClient()->post(
-            '/oauth2/token',
-            $parameters,
-            array_merge($this->getDefaultHeaders(), $headers)
-        );
-        $content = $response->getContent();
-        $bearerToken = isset($content['access_token']) ? $content['access_token'] : null;
-        return $this->getUser($bearerToken);
-    }
-    /**
      * Send a GET request with query parameters.
      *
      * @param string $path Request path.
@@ -220,7 +121,7 @@ class UpholdClient
      *
      * @return \GuzzleHttp\EntityBodyInterface|mixed|string
      */
-    public function get($path, array $parameters = array(), $requestHeaders = array())
+    public function get($path, array $parameters = [], $requestHeaders = [])
     {
         return $this->getHttpClient()->get(
             $this->buildPath($path),
@@ -228,6 +129,7 @@ class UpholdClient
             array_merge($this->getDefaultHeaders(), $requestHeaders)
         );
     }
+
     /**
      * Send a POST request with JSON-encoded parameters.
      *
@@ -237,7 +139,7 @@ class UpholdClient
      *
      * @return \GuzzleHttp\EntityBodyInterface|mixed|string
      */
-    public function post($path, array $parameters = array(), $requestHeaders = array())
+    public function post($path, array $parameters = [], $requestHeaders = [])
     {
         return $this->getHttpClient()->post(
             $this->buildPath($path),
@@ -245,6 +147,7 @@ class UpholdClient
             array_merge($this->getDefaultHeaders(), $requestHeaders)
         );
     }
+
     /**
      * Send a PATCH request with JSON-encoded parameters.
      *
@@ -254,7 +157,7 @@ class UpholdClient
      *
      * @return \GuzzleHttp\EntityBodyInterface|mixed|string
      */
-    public function patch($path, array $parameters = array(), $requestHeaders = array())
+    public function patch($path, array $parameters = [], $requestHeaders = [])
     {
         return $this->getHttpClient()->patch(
             $this->buildPath($path),
@@ -262,6 +165,7 @@ class UpholdClient
             array_merge($this->getDefaultHeaders(), $requestHeaders)
         );
     }
+
     /**
      * Send a PUT request with JSON-encoded parameters.
      *
@@ -271,7 +175,7 @@ class UpholdClient
      *
      * @return \GuzzleHttp\EntityBodyInterface|mixed|string
      */
-    public function put($path, array $parameters = array(), $requestHeaders = array())
+    public function put($path, array $parameters = [], $requestHeaders = [])
     {
         return $this->getHttpClient()->put(
             $this->buildPath($path),
@@ -279,6 +183,7 @@ class UpholdClient
             array_merge($this->getDefaultHeaders(), $requestHeaders)
         );
     }
+
     /**
      * Send a DELETE request with JSON-encoded parameters.
      *
@@ -288,7 +193,7 @@ class UpholdClient
      *
      * @return \GuzzleHttp\EntityBodyInterface|mixed|string
      */
-    public function delete($path, array $parameters = array(), $requestHeaders = array())
+    public function delete($path, array $parameters = [], $requestHeaders = [])
     {
         return $this->getHttpClient()->delete(
             $this->buildPath($path),
@@ -309,8 +214,10 @@ class UpholdClient
         if (empty($this->options['api_version'])) {
             return $path;
         }
+
         return sprintf('%s%s', $this->options['api_version'], $path);
     }
+
     /**
      * Create a JSON encoded version of an array of parameters.
      *
@@ -324,8 +231,10 @@ class UpholdClient
         if (empty($parameters)) {
             $options = JSON_FORCE_OBJECT;
         }
+
         return json_encode($parameters, $options);
     }
+
     /**
      * Create the API default headers that are mandatory.
      *
@@ -333,14 +242,19 @@ class UpholdClient
      */
     protected function getDefaultHeaders()
     {
-        $headers = array(
+        $headers = [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-            'User-Agent' => str_replace('{version}', sprintf('v%s', $this->getOption('version')), $this->getOption('user_agent')),
-        );
+            'User-Agent' => str_replace(
+                '{version}',
+                sprintf('v%s', $this->getOption('version')),
+                $this->getOption('user_agent')
+            ),
+        ];
         if (null !== $this->getOption('bearer') && '' !== $this->getOption('bearer')) {
             $headers['Authorization'] = sprintf('Bearer %s', $this->getOption('bearer'));
         }
+
         return $headers;
     }
 }

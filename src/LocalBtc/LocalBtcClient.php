@@ -136,12 +136,12 @@ class LocalBtcClient
             $minAmount = (float)$data['min_amount'];
             $maxAmount = (float)$data['max_amount'];
             if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
-                $mark .= '$';
+                $mark .= '<info>$</info>';
                 $skip = false;
             }
             $matchBankname = str_replace(' ', '', $bankName);
             if (stripos($matchBankname, $options['bank']) !== false) {
-                $mark .= '+';
+                $mark .= '<fg=cyan>+</>';
             }
             $row = [
                 $bankName,
@@ -150,10 +150,10 @@ class LocalBtcClient
                 $maxAmount,
                 $ad['actions']['public_view'].$mark,
             ];
-            if ($options['username']) {
+            if (isset($options['username']) && $options['username']) {
                 $row[] = $data['profile']['name'];
             }
-            if ($skip && $options['exclude']) {
+            if ($skip && isset($options['exclude']) && $options['exclude']) {
                 continue;
             }
             $dataRows[] = $row;
