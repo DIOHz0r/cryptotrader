@@ -126,7 +126,8 @@ class UpholdSellCommand extends Command
         $headers = ['payment', 'price', 'min', 'max', 'rate', 'send'];
 
         // Find ETH
-        $output->writeln('<info>Getting localethereum ads, Market rate ('.$ethTicket['bid'].')</info>');
+        $marketRate = $ethTicket['ask'] + abs($ethTicket['ask'] - $ethTicket['bid']);
+        $output->writeln('<info>Getting localethereum ads, Market rate '.$marketRate.' (approx.)</info>');
         $queryUrl = LocalEthClient::API_URL.'/v1/offers/find?offer_type=buy&sort_by=price&city_id='.$country;
         $ethRows = $this->ethClient->listAds($queryUrl, $options);
         $ethDataRows = $this->processDataRows($ethRows, $top, $options['amount'], $ethTicket);
@@ -142,7 +143,8 @@ class UpholdSellCommand extends Command
 
 
         // Find BTC
-        $output->writeln('<info>Getting localbitcoins ads, Market rate ('.$btcTicket['bid'].')</info>');
+        $marketRate = $btcTicket['ask'] + abs($btcTicket['ask'] - $btcTicket['bid']);
+        $output->writeln('<info>Getting localbitcoins ads, Market rate '.$marketRate.' (approx.)</info>');
         $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields=profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
         $btcRows = $this->btcClient->listAds($queryUrl, $options);
         $btcDataRows = $this->processDataRows($btcRows, $top, $options['amount'], $btcTicket);
@@ -203,7 +205,7 @@ class UpholdSellCommand extends Command
         $finalData = [];
         foreach ($dataRows as $key => $row) {
             // calc the price rate
-            $marketRate = $ticket['bid'] * 1.005; // approx percent
+            $marketRate = $ticket['ask'] + abs($ticket['ask'] - $ticket['bid']); // approx
             $sellerRate = $row[$this->tableColums['price']] / $marketRate;
             $row['rate'] = $sellerRate;
 
