@@ -2,6 +2,36 @@
     "composer/ca-bundle": {
         "version": "1.1.1"
     },
+    "consolidation/annotated-command": {
+        "version": "2.10.2"
+    },
+    "consolidation/config": {
+        "version": "1.1.1"
+    },
+    "consolidation/log": {
+        "version": "1.0.6"
+    },
+    "consolidation/output-formatters": {
+        "version": "3.4.0"
+    },
+    "consolidation/robo": {
+        "version": "1.3.4"
+    },
+    "consolidation/self-update": {
+        "version": "1.1.5"
+    },
+    "container-interop/container-interop": {
+        "version": "1.2.0"
+    },
+    "dflydev/dot-access-data": {
+        "version": "v1.1.0"
+    },
+    "grasmash/expander": {
+        "version": "1.0.0"
+    },
+    "grasmash/yaml-expander": {
+        "version": "1.4.0"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.3.2"
     },
@@ -10,6 +40,9 @@
     },
     "guzzlehttp/psr7": {
         "version": "1.4.2"
+    },
+    "league/container": {
+        "version": "2.4.1"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -25,6 +58,9 @@
     },
     "psr/simple-cache": {
         "version": "1.0.1"
+    },
+    "ralouphie/getallheaders": {
+        "version": "2.0.5"
     },
     "sensiolabs/security-checker": {
         "version": "4.0",
@@ -49,6 +85,9 @@
             "version": "3.3",
             "ref": "e3868d2f4a5104f19f844fe551099a00c6562527"
         }
+    },
+    "symfony/contracts": {
+        "version": "v1.0.2"
     },
     "symfony/debug": {
         "version": "v4.0.8"
@@ -101,6 +140,9 @@
     "symfony/polyfill-mbstring": {
         "version": "v1.7.0"
     },
+    "symfony/process": {
+        "version": "v4.2.1"
+    },
     "symfony/routing": {
         "version": "4.0",
         "recipe": {
@@ -109,6 +151,9 @@
             "version": "4.0",
             "ref": "cda8b550123383d25827705d05a42acf6819fe4e"
         }
+    },
+    "symfony/var-exporter": {
+        "version": "v4.2.1"
     },
     "symfony/yaml": {
         "version": "v4.0.8"
