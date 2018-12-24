@@ -2,8 +2,9 @@
 
 ## Synopsis
 
-This command client is for search cryptocurrencies advertisements or prices on different web pages like 
-[Localbitcoins](https://www.localbicoins.com) or [Uphold](https://www.uphold.com) for now. 
+This command client is for search cryptocurrencies advertisements different web pages like 
+[Localbitcoins](https://www.localbicoins.com) and [Localethereum](https://www.localethereum.com), 
+it also allows you to search the best prices to sell your cryptos on [Uphold](https://www.uphold.com) for now. 
 
 More services and options will be available coming soon.
 
@@ -17,37 +18,72 @@ Clone or download the repo and run
 
 ## How to use
 
-Just execute the following command ```php bin/console``` and you will get the available options, for example
-```php bin/console localbtc:sell:online EUR``` will search all sell ads on localbitcoin.com for EUR currency.
+Suppose that you want to list all ads on localbitcoin.com payed in Euros just execute the following command
 
-If you want to check the options available for each command execute its help, like 
+```php bin/console localbtc:sell:online EUR```
+
+This will order all the ads from the lowes price to the highest 
+price in ascending order, that means that the last listed ads are the highest prices found.
+
+Now if you want to filter the results for the top 15 ads with a price of 100 EUR execute the previous command as follows
+
+```php bin/console localbtc:sell:online EUR -a 100 -t 15```
+
+For localethereum the command is almost the same but you have to add the country [ISO](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) 
+code as the first argument 
+
+```php bin/console localeth:sell:online AU -a 100 -t 15```.
+
+If you want to sell your Uphold card balance the script will look on each trading platform and will print the results 
+as previous commands, you need to set at least the country and the currency to obtain, for instance to find the top 20 
+ads in Venezuela (VE) for obtain 10000 Bolivares Soberanos (VES) selling your BTC or ETH excluding the not compatible 
+ads execute:
+
+```php bin/console uphold:sell VE VES -a 10000 -t 20 -x``` 
+
+If you want to check the options available execute the console help 
+
+```php bin/console --help``` 
+
+If you want to check the options available for each command execute its help
+
 ```php bin/console localbtc:sell:online --help``` 
 
 
 ## Versioning
 
-In order to provide transparency on our release cycle and to maintain backward compatibility, this project is 
-maintained under [the Semantic Versioning guidelines](http://semver.org/). We are committed to following and 
-complying with the rules, the best we can.
+In order to provide transparency on the release cycle and to maintain backward compatibility, this project is 
+maintained under [the Semantic Versioning guidelines](http://semver.org/). I am committed to following and 
+complying with the rules, the best I can.
 
 ## How to contribute
 
-Want to file a bug, contribute some code, or improve documentation? Excellent! Follow up our guidelines for contributing
+Want to file a bug, contribute some code, or improve documentation? Excellent! Follow up the guidelines for contributing
 
-### <a name="1"></a> 1. See what's going on! [:top:](#top)
-
-#### <a name="1.1"></a> 1.1 Issue Dashboard
-If you want to know all the issues or like to implement a new feature please we're dealing with right now, take a look 
-at our [Issue Dashboard](https://github.com/DIOHz0r/cryptotrader/issues) and look for areas in which you can help.
+#### Issue Dashboard
+If you want to know all the issues I'm dealing with right now or like to implement a new feature please take a look 
+at the [Issue Dashboard](https://github.com/DIOHz0r/cryptotrader/issues) and look for areas in which you can help.
 
 
-#### <a name="1.2"></a> 1.2 Pull Request Dashboard
-If you want to give us a hand solving issues then great, take a look at our [Pull Request Dashboard](https://github.com/DIOHz0r/cryptotrader/pulls) 
-and check for an open or closed PR. We don’t want to duplicate efforts.
+#### Pull Request Dashboard
+If you want to give me a hand solving issues then great, take a look at the [Pull Request Dashboard](https://github.com/DIOHz0r/cryptotrader/pulls) 
+and check for an open or closed PR. I don’t want to duplicate efforts.
 
-#### <a name="1.3"></a> 1.3 Commit Your Changes
-For commits, we follow the [Conventional Commit](http://conventionalcommits.org/). This leads to **more readable 
-messages** that are easy to follow when looking through the project history. But also, we use the git commit messages 
+#### Commit Your Changes
+For commits, I follow the [Conventional Commit](http://conventionalcommits.org/). This leads to **more readable 
+messages** that are easy to follow when looking through the project history. But also, I use the git commit messages 
 to **automatically generate changelogs** from these messages. 
 
 Please read and follow the guide provided by Conventional Commit project
+
+#### Donations
+Do you like our work and want to donate some cryptos? 
+
+I ask at least the amount of 0.0001 of BTC, DASH, ETH or LTC that can be sent to one of the following addresses
+
+* BTC: `1DniVH7mHTZo8sa8gsqBzfspv5MQkFwFcx`
+* DASH: `XwQoZy71zp3V54nA44GiUhEL14hvy7zwzh`
+* ETH: `0xc0A47F4c950f908083EF360c4eFA941aCaCCede6`
+* LTC: `LcbMxHcPfcBWF6FyRPrNUBHhi8EVVn2z33`
+
+Thank you so much for your support!
