@@ -20,16 +20,18 @@
 namespace App\Command;
 
 
-use App\LocalEth\LocalEthClient;
+use App\LocalCryptos\LocalCryptosClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class LocalEthCommand extends Command
+class LocalCryptosCommand extends Command
 {
 
-    protected static $defaultName = 'localeth';
+    protected static $defaultName = 'lc';
 
     /**
      * @var array
@@ -41,14 +43,20 @@ class LocalEthCommand extends Command
     ];
 
     /**
-     * @var LocalEthClient
+     * @var LocalCryptosClient
      */
     protected $client;
 
+    /**
+     * Set crypto market
+     * @var int
+     */
+    protected $marketId;
 
-    public function __construct(LocalEthClient $LocalEthClient)
+
+        public function __construct(LocalCryptosClient $localCryptosClient)
     {
-        $this->client = $LocalEthClient;
+        $this->client = $localCryptosClient;
         parent::__construct();
     }
 
@@ -66,7 +74,26 @@ class LocalEthCommand extends Command
                 'Exclude other ads not related to the searched amount'
             )
             ->addOption('username', 'u', InputOption::VALUE_NONE, 'Show username')
-            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0);
+            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0)
+            ->addOption('coin', 'o', InputOption::VALUE_OPTIONAL, 'Set coin type (use ticker symbol)', 'ETH');
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $coin = strtoupper($input->getOption('coin'));
+        switch ($coin) {
+            case 'ETH':
+                 $this->marketId = 1;
+                break;
+            case 'BTC':
+                $this->marketId = 2;
+                break;
+            case 'LTC':
+                $this->marketId = 3;
+                break;
+            default:
+                throw new \RuntimeException('Invalid ticker symbol');
+        }
     }
 
     /**

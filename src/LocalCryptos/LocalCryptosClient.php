@@ -17,21 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\LocalEth;
+namespace App\LocalCryptos;
 
 use App\HttpClient\HttpClient;
 use App\HttpClient\HttpClientInterface;
 
-class LocalEthClient
+class LocalCryptosClient
 {
     /**
      * API urls.
      */
-    const API_URL = 'https://api.localethereumapi.com';
-    const SANDBOX_API_URL = 'https://api.localethereumapi.com';
+    const API_URL = 'https://localcryptosapi.com';
+    const SANDBOX_API_URL = 'https://localcryptosapi.com';
 
     /**
-     * Guzzle instance used to communicate with Localethereum.
+     * Guzzle instance used to communicate with Localcryptos.
      *
      * @var HttpClient
      */
@@ -45,7 +45,7 @@ class LocalEthClient
     /**
      * Constructor.
      *
-     * @param array $options LocalethereumClient options.
+     * @param array $options LocalcryptosClient options.
      */
     public function __construct(array $options = [])
     {
@@ -150,7 +150,7 @@ class LocalEthClient
                 $ad['price']['amount_including_taker_fee'],
                 $minAmount,
                 $maxAmount,
-                'https://localethereum.com/offer/'.$ad['id'].$mark,
+                'https://localcryptos.com/offer/'.$ad['id'].$mark,
             ];
             if (isset($options['username']) && $options['username']) {
                 $row[] = $ad['account_username'].' ('.$ad['account_intro'].')';

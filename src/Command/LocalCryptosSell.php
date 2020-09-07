@@ -20,13 +20,13 @@
 namespace App\Command;
 
 
-use App\LocalEth\LocalEthClient;
+use App\LocalCryptos\LocalCryptosClient;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LocalEthBuy extends LocalEthCommand
+class LocalCryptosSell extends LocalCryptosCommand
 {
 
     protected function configure()
@@ -34,12 +34,12 @@ class LocalEthBuy extends LocalEthCommand
         parent::configure();
         $this
             // the name of the command (the part after "bin/console")
-            ->setName('localeth:buy:online')
+            ->setName('lc:sell:online')
             // the short description shown while running "php bin/console list"
-            ->setDescription('List online buys.')
+            ->setDescription('List online sells.')
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Returns the online buys ads from localethereum.')
+            ->setHelp('Returns the online sell ads from localcryptos.')
             ->addArgument('country', InputArgument::REQUIRED, 'Country ISO 3166-2 code')
         ;
     }
@@ -59,9 +59,10 @@ class LocalEthBuy extends LocalEthCommand
         $options['exclude'] = $input->getOption('exclude');
         $options['amount'] = $input->getOption('amount');
         $options['bank'] = $input->getOption('bank');
+        $options['market_id'] = $this->marketId;
 
         // Request end-point
-        $queryUrl = LocalEthClient::API_URL.'/v1/offers/find?offer_type=sell&sort_by=price&city_id='.$country;
+        $queryUrl = LocalCryptosClient::API_URL.'/v1/offers/find?offer_type=buy&sort_by=price&city_id=' . $country . '&market_id=' . $options['market_id'];
         $dataRows = $this->client->listAds($queryUrl, $options);
         if (!$dataRows) {
             $output->writeln('No results found.');
@@ -70,11 +71,7 @@ class LocalEthBuy extends LocalEthCommand
         }
 
         // Process result
-        $dataRows = $this->processDataRows(
-            $dataRows,
-            $top,
-            ['price_sort' => SORT_DESC, 'min_max_sort' => SORT_DESC]
-        );
+        $dataRows = $this->processDataRows($dataRows, $top);
 
         // Print the result
         $format = $input->getOption('json');
