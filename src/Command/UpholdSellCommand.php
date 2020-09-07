@@ -21,7 +21,7 @@ namespace App\Command;
 
 
 use App\LocalBtc\LocalBtcClient;
-use App\LocalEth\LocalEthClient;
+use App\LocalCryptos\LocalCryptosClient;
 use App\Uphold\UpholdClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -61,7 +61,7 @@ class UpholdSellCommand extends Command
         'rate' => 'rate',
     ];
 
-    public function __construct(UpholdClient $upholdClient, LocalBtcClient $btcClient, LocalEthClient $ethClient)
+    public function __construct(UpholdClient $upholdClient, LocalBtcClient $btcClient, LocalCryptosClient $ethClient)
     {
         $this->btcClient = $btcClient;
         $this->ethClient = $ethClient;
@@ -125,10 +125,10 @@ class UpholdSellCommand extends Command
         $table = new Table($output);
         $headers = ['payment', 'price', 'min', 'max', 'rate', 'send'];
 
-        // Find ETH
+        // Find LocalCryptos
         $marketRate = $ethTicket['ask'] + abs($ethTicket['ask'] - $ethTicket['bid']);
-        $output->writeln('<info>Getting localethereum ads, Market rate '.$marketRate.' (approx.)</info>');
-        $queryUrl = LocalEthClient::API_URL.'/v1/offers/find?offer_type=buy&sort_by=price&city_id='.$country;
+        $output->writeln('<info>Getting localcryptos ads, Market rate '.$marketRate.' (approx.)</info>');
+        $queryUrl = LocalCryptosClient::API_URL.'/v1/offers/find?offer_type=buy&sort_by=price&city_id='.$country;
         $ethRows = $this->ethClient->listAds($queryUrl, $options);
         $ethDataRows = $this->processDataRows($ethRows, $top, $options['amount'], $ethTicket);
 
@@ -142,7 +142,7 @@ class UpholdSellCommand extends Command
         }
 
 
-        // Find BTC
+        // Find LocalBTC
         $marketRate = $btcTicket['ask'] + abs($btcTicket['ask'] - $btcTicket['bid']);
         $output->writeln('<info>Getting localbitcoins ads, Market rate '.$marketRate.' (approx.)</info>');
         $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields=profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
