@@ -1,5 +1,9 @@
 # Changelog
 
+#### [0.2.0](https://github.com/DIOHz0r/cryptotrader/tree/0.2.0) (2020-09-15)
+
+ * feature: change localeth to localcryptos ([1e16405](https://github.com/DIOHz0r/cryptotrader/commit/1e16405))
+
 #### [0.1.0](https://github.com/DIOHz0r/cryptotrader/tree/0.1.0) (2018-12-24)
 
  * feature: add uphold sell command ([b6c3800](https://github.com/DIOHz0r/cryptotrader/commit/b6c3800))
