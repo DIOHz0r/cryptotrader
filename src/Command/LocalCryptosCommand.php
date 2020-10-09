@@ -91,6 +91,9 @@ class LocalCryptosCommand extends Command
             case 'LTC':
                 $this->marketId = 3;
                 break;
+            case 'DASH':
+                $this->marketId = 4;
+                break;
             default:
                 throw new \RuntimeException('Invalid ticker symbol');
         }
