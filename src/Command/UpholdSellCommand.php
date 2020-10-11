@@ -135,7 +135,7 @@ class UpholdSellCommand extends Command
         if (!$ethDataRows) {
             $output->writeln('No results found.');
 
-            return;
+            return 0;
         } else {
             $table->setHeaders($headers)->setRows($ethDataRows);
             $table->render();
@@ -152,7 +152,7 @@ class UpholdSellCommand extends Command
         if (!$btcDataRows) {
             $output->writeln('No results found.');
 
-            return;
+            return 0;
         } else {
             $table->setHeaders($headers)->setRows($btcDataRows);
             $table->render();

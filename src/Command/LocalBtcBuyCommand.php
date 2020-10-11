@@ -97,7 +97,7 @@ class LocalBtcBuyCommand extends Command
         if (!$dataRows) {
             $output->writeln('No results found.');
 
-            return;
+            return 0;
         }
 
         // Process result
@@ -113,7 +113,7 @@ class LocalBtcBuyCommand extends Command
         if ($format) {
             $output->write(json_encode($dataRows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-            return;
+            return 0;
         }
 
         $table = new Table($output);
@@ -123,6 +123,8 @@ class LocalBtcBuyCommand extends Command
         }
         $table->setHeaders($headers)->setRows($dataRows);
         $table->render();
+
+        return 0;
     }
 
 }

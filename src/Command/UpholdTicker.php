@@ -58,5 +58,7 @@ class UpholdTicker extends Command
         $table = new Table($output);
         $table->setHeaders(['ask', 'bid', 'currency', 'pair'])->setRows($contents);
         $table->render();
+
+        return 0;
     }
 }
