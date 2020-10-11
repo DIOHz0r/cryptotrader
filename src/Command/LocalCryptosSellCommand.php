@@ -21,27 +21,59 @@ namespace App\Command;
 
 
 use App\LocalCryptos\LocalCryptosClient;
+use App\LocalCryptos\LocalCryptosProcessAdsTrait;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LocalCryptosSell extends LocalCryptosCommand
+class LocalCryptosSellCommand extends Command
 {
+    use LocalCryptosProcessAdsTrait;
+
+    protected static $defaultName = 'lc:sell:online';
+
+    /**
+     * @var LocalCryptosClient
+     */
+    protected $client;
+
+    public function __construct(LocalCryptosClient $localCryptosClient)
+    {
+        $this->client = $localCryptosClient;
+        parent::__construct();
+    }
 
     protected function configure()
     {
-        parent::configure();
         $this
-            // the name of the command (the part after "bin/console")
-            ->setName('lc:sell:online')
+            ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
+            ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
+            ->addOption('currency', 'c', InputOption::VALUE_REQUIRED, 'Show only the selected currency', '')
+            ->addOption('json', 'j', InputOption::VALUE_NONE, 'Print the result as json string')
+            ->addOption(
+                'exclude',
+                'x',
+                InputOption::VALUE_NONE,
+                'Exclude other ads not related to the searched amount'
+            )
+            ->addOption('username', 'u', InputOption::VALUE_NONE, 'Show username')
+            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0)
+            ->addOption('coin', 'o', InputOption::VALUE_OPTIONAL, 'Set coin type (use ticker symbol)', 'ETH')
             // the short description shown while running "php bin/console list"
-            ->setDescription('List online sells.')
+            ->setDescription('List online sells from localcryptos.')
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Returns the online sell ads from localcryptos.')
             ->addArgument('country', InputArgument::REQUIRED, 'Country ISO 3166-2 code')
         ;
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $this->switchMarket($input->getOption('coin'));
     }
 
     /**
