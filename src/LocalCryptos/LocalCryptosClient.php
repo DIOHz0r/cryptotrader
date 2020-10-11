@@ -19,10 +19,11 @@
 
 namespace App\LocalCryptos;
 
+use App\HttpClient\CrawlerInterface;
 use App\HttpClient\HttpClient;
 use App\HttpClient\HttpClientInterface;
 
-class LocalCryptosClient
+class LocalCryptosClient implements CrawlerInterface
 {
     /**
      * API urls.

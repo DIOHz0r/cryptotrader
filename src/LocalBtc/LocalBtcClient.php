@@ -19,10 +19,11 @@
 
 namespace App\LocalBtc;
 
+use App\HttpClient\CrawlerInterface;
 use App\HttpClient\HttpClient;
 use App\HttpClient\HttpClientInterface;
 
-class LocalBtcClient
+class LocalBtcClient implements CrawlerInterface
 {
     /**
      * API urls.
