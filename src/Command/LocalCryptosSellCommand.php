@@ -21,7 +21,7 @@ namespace App\Command;
 
 
 use App\LocalCryptos\LocalCryptosClient;
-use App\LocalCryptos\LocalCryptosProcessAdsTrait;
+use App\Traits\LocalCryptosProcessAdsTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\LocalCryptos;
+namespace App\Traits;
 
 
 use Symfony\Component\Console\Helper\TableCell;
@@ -9,6 +9,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 trait LocalCryptosProcessAdsTrait
 {
+    use DataRowsTrait;
 
     /**
      * @var array
@@ -62,21 +63,8 @@ trait LocalCryptosProcessAdsTrait
         $top,
         $sort = ['price_sort' => SORT_ASC, 'min_max_sort' => SORT_DESC]
     ): array {
-        $price = array_column($dataRows, $this->tableColums['price']);
-        $minimun = array_column($dataRows, $this->tableColums['min']);
-        $maximun = array_column($dataRows, $this->tableColums['max']);
-        array_multisort(
-            $price,
-            $sort['price_sort'],
-            $minimun,
-            $sort['min_max_sort'],
-            $maximun,
-            $sort['min_max_sort'],
-            $dataRows
-        );
-        if ($top > 0 && count($dataRows) > $top) {
-            $dataRows = array_slice($dataRows, (-1 * $top));
-        }
+        $dataRows = $this->sortDataRows($dataRows, $this->tableColums['price'], $this->tableColums['min'],
+            $this->tableColums['max'], $sort['min_max_sort'], $top);
         $finalData = [];
         foreach ($dataRows as $key => $row) {
             $fmt = new \NumberFormatter('und_'.$row['country_code'], \NumberFormatter::CURRENCY);

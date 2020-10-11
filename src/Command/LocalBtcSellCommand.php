@@ -21,7 +21,7 @@ namespace App\Command;
 
 
 use App\LocalBtc\LocalBtcClient;
-use App\LocalBtc\LocalBtcProcessAdsTrait;
+use App\Traits\LocalBtcProcessAdsTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\LocalBtc;
+namespace App\Traits;
 
 
 use Symfony\Component\Console\Helper\TableCell;
@@ -8,6 +8,8 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 trait LocalBtcProcessAdsTrait
 {
+    use DataRowsTrait;
+
     /**
      * @var array
      */
@@ -32,21 +34,8 @@ trait LocalBtcProcessAdsTrait
         $currency,
         $sort = ['price_sort' => SORT_ASC, 'min_max_sort' => SORT_DESC]
     ): array {
-        $price = array_column($dataRows, $this->tableColums['price']);
-        $minimun = array_column($dataRows, $this->tableColums['min']);
-        $maximun = array_column($dataRows, $this->tableColums['max']);
-        array_multisort(
-            $price,
-            $sort['price_sort'],
-            $minimun,
-            $sort['min_max_sort'],
-            $maximun,
-            $sort['min_max_sort'],
-            $dataRows
-        );
-        if ($top > 0 && count($dataRows) > $top) {
-            $dataRows = array_slice($dataRows, (-1 * $top));
-        }
+        $dataRows = $this->sortDataRows($dataRows, $this->tableColums['price'], $this->tableColums['min'],
+            $this->tableColums['max'], $sort['min_max_sort'], $top);
         $finalData = [];
         $fmt = new \NumberFormatter($currency, \NumberFormatter::CURRENCY);
         foreach ($dataRows as $key => $row) {
