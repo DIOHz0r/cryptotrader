@@ -21,26 +21,57 @@ namespace App\Command;
 
 
 use App\LocalBtc\LocalBtcClient;
+use App\LocalBtc\LocalBtcProcessAdsTrait;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class LocalBtcSell extends LocalBtcCommand
+class LocalBtcBuyCommand extends Command
 {
+    use LocalBtcProcessAdsTrait;
+
+    protected static $defaultName = 'localbtc:buy:online';
+
+    /**
+     * @var LocalBtcClient
+     */
+    protected $client;
+
+    /**
+     * @var string field to search by default
+     */
+    protected $defaultFields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
+
+
+    public function __construct(LocalBtcClient $localBtcClient)
+    {
+        $this->client = $localBtcClient;
+        parent::__construct();
+    }
 
     protected function configure()
     {
-        parent::configure();
         $this
-            // the name of the command (the part after "bin/console")
-            ->setName('localbtc:sell:online')
+            ->addOption('amount', 'a', InputOption::VALUE_REQUIRED, 'Desired amount to trade', 0)
+            ->addOption('bank', 'b', InputOption::VALUE_REQUIRED, 'Bank name', '')
+            ->addOption('json', 'j', InputOption::VALUE_NONE, 'Prin the result as json string')
+            ->addOption(
+                'exclude',
+                'x',
+                InputOption::VALUE_NONE,
+                'Exclude other ads not related to the searched ammount'
+            )
+            ->addOption('username', 'u', InputOption::VALUE_NONE, 'Show username and reputation')
+            ->addOption('top', 't', InputOption::VALUE_OPTIONAL, 'Show top number of ads', 0)
             // the short description shown while running "php bin/console list"
-            ->setDescription('List online sells.')
+            ->setDescription('List online buys from localbitcoins.')
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Returns the online sells ads from localbitcoin.')
+            ->setHelp('Returns the online buys ads from localbitcoin.')
             ->addArgument('currency', InputArgument::REQUIRED, 'Currency ISO code')
         ;
     }
@@ -61,7 +92,7 @@ class LocalBtcSell extends LocalBtcCommand
         $options['bank'] = $input->getOption('bank');
 
         // Request end-point
-        $queryUrl = LocalBtcClient::API_URL.'/sell-bitcoins-online/'.$currency.'/.json?fields='.$this->defaultFields;
+        $queryUrl = LocalBtcClient::API_URL.'/buy-bitcoins-online/'.$currency.'/.json?fields='.$this->defaultFields;
         $dataRows = $this->client->listAds($queryUrl, $options);
         if (!$dataRows) {
             $output->writeln('No results found.');
@@ -70,7 +101,12 @@ class LocalBtcSell extends LocalBtcCommand
         }
 
         // Process result
-        $dataRows = $this->processDataRows($dataRows, $top, $currency);
+        $dataRows = $this->processDataRows(
+            $dataRows,
+            $top,
+            $currency,
+            ['price_sort' => SORT_DESC, 'min_max_sort' => SORT_DESC]
+        );
 
         // Print the result
         $format = $input->getOption('json');
