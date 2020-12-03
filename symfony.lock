@@ -45,7 +45,7 @@
         "version": "2.4.1"
     },
     "php": {
-        "version": "7.2"
+        "version": "7.3"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -139,6 +139,9 @@
             "version": "3.3",
             "ref": "8a2f7fa50a528f0aad1d7a87ae3730c981b367ce"
         }
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
     },
     "symfony/http-foundation": {
         "version": "v4.0.8"
