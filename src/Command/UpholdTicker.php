@@ -20,7 +20,7 @@
 namespace App\Command;
 
 
-use App\HttpClient\HttpClient;
+use App\HttpClient\HttpClientInterface;
 use App\Uphold\UpholdClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -29,9 +29,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpholdTicker extends Command
 {
+    /**
+     * @var HttpClientInterface
+     */
     protected $client;
 
-    public function __construct(HttpClient $client)
+    public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
         parent::__construct();

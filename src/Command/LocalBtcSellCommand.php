@@ -20,6 +20,7 @@
 namespace App\Command;
 
 
+use App\HttpClient\CrawlerInterface;
 use App\LocalBtc\LocalBtcClient;
 use App\Traits\LocalBtcProcessAdsTrait;
 use Symfony\Component\Console\Command\Command;
@@ -37,7 +38,7 @@ class LocalBtcSellCommand extends Command
     protected static $defaultName = 'localbtc:sell:online';
 
     /**
-     * @var LocalBtcClient
+     * @var CrawlerInterface
      */
     protected $client;
 
@@ -47,7 +48,7 @@ class LocalBtcSellCommand extends Command
     protected $defaultFields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
 
 
-    public function __construct(LocalBtcClient $localBtcClient)
+    public function __construct(CrawlerInterface $localBtcClient)
     {
         $this->client = $localBtcClient;
         parent::__construct();

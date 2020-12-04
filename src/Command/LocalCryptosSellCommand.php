@@ -20,6 +20,7 @@
 namespace App\Command;
 
 
+use App\HttpClient\CrawlerInterface;
 use App\LocalCryptos\LocalCryptosClient;
 use App\Traits\LocalCryptosProcessAdsTrait;
 use Symfony\Component\Console\Command\Command;
@@ -36,11 +37,11 @@ class LocalCryptosSellCommand extends Command
     protected static $defaultName = 'lc:sell:online';
 
     /**
-     * @var LocalCryptosClient
+     * @var CrawlerInterface
      */
     protected $client;
 
-    public function __construct(LocalCryptosClient $localCryptosClient)
+    public function __construct(CrawlerInterface $localCryptosClient)
     {
         $this->client = $localCryptosClient;
         parent::__construct();

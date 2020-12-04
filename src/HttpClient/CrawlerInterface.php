@@ -2,7 +2,6 @@
 
 namespace App\HttpClient;
 
-use App\LocalBtc\LocalBtcClient;
 
 interface CrawlerInterface
 {

@@ -20,6 +20,7 @@
 namespace App\Command;
 
 
+use App\HttpClient\CrawlerInterface;
 use App\LocalBtc\LocalBtcClient;
 use App\LocalCryptos\LocalCryptosClient;
 use App\Uphold\UpholdClient;
@@ -34,8 +35,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpholdSellCommand extends Command
 {
+    /**
+     * @var CrawlerInterface
+     */
     protected $btcClient;
+
+    /**
+     * @var CrawlerInterface
+     */
     protected $ethClient;
+
+    /**
+     * @var UpholdClient
+     */
     protected $upholdClient;
 
     # Withdrawal fees
@@ -61,10 +73,10 @@ class UpholdSellCommand extends Command
         'rate' => 'rate',
     ];
 
-    public function __construct(UpholdClient $upholdClient, LocalBtcClient $btcClient, LocalCryptosClient $ethClient)
+    public function __construct(UpholdClient $upholdClient, CrawlerInterface $localBtcClient, CrawlerInterface $localCryptosClient)
     {
-        $this->btcClient = $btcClient;
-        $this->ethClient = $ethClient;
+        $this->btcClient = $localBtcClient;
+        $this->ethClient = $localCryptosClient;
         $this->upholdClient = $upholdClient;
         parent::__construct();
     }
