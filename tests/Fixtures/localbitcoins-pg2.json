@@ -1,0 +1,145 @@
+{
+  "data": {
+    "ad_list": [
+      {
+        "data": {
+          "profile": {
+            "username": "gonzalezj231",
+            "trade_count": "20 000+",
+            "feedback_score": 100,
+            "name": "gonzalezj231 (20 000+; 100%)",
+            "last_online": "2020-12-07T17:47:45+00:00"
+          },
+          "visible": true,
+          "hidden_by_opening_hours": false,
+          "location_string": "Yaracuy, Venezuela",
+          "countrycode": "VE",
+          "city": "Yaracuy",
+          "trade_type": "ONLINE_BUY",
+          "online_provider": "SPECIFIC_BANK",
+          "first_time_limit_btc": null,
+          "volume_coefficient_btc": "1.50",
+          "sms_verification_required": false,
+          "currency": "VES",
+          "lat": 0.0,
+          "lon": 0.0,
+          "min_amount": "15000000.00",
+          "max_amount": "231416957.95",
+          "max_amount_available": "231416957.95",
+          "ad_id": 897333,
+          "temp_price_usd": "19613.56",
+          "temp_price": "18312100100.00",
+          "created_at": "2018-12-13T11:34:34+00:00",
+          "require_feedback_score": 0,
+          "require_trade_volume": 0.0,
+          "msg": "Saludos\n\n1) Dejar datos sin espacios o simbolos\n2) Una cuenta por trato\n3) No envi\u00f3 comprobante por correo\n4) Se paga en orden",
+          "bank_name": "Banesco, Ahorro, Corriente y jur\u00eddica",
+          "atm_model": null,
+          "require_trusted_by_advertiser": false,
+          "require_identification": false,
+          "is_local_office": false,
+          "payment_window_minutes": 90,
+          "limit_to_fiat_amounts": "",
+          "is_low_risk": true
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/897333"
+        }
+      },
+      {
+        "data": {
+          "profile": {
+            "username": "Brother10",
+            "trade_count": "3000+",
+            "feedback_score": 100,
+            "name": "Brother10 (3000+; 100%)",
+            "last_online": "2020-12-07T17:37:45+00:00"
+          },
+          "visible": true,
+          "hidden_by_opening_hours": false,
+          "location_string": "Venezuela",
+          "countrycode": "VE",
+          "city": "",
+          "trade_type": "ONLINE_BUY",
+          "online_provider": "SPECIFIC_BANK",
+          "first_time_limit_btc": null,
+          "volume_coefficient_btc": "1.50",
+          "sms_verification_required": false,
+          "currency": "VES",
+          "lat": 0.0,
+          "lon": 0.0,
+          "min_amount": "10000000.00",
+          "max_amount": "100531382.07",
+          "max_amount_available": "100531382.07",
+          "ad_id": 1201506,
+          "temp_price_usd": "19557.77",
+          "temp_price": "18260005000.00",
+          "created_at": "2020-05-28T18:43:21+00:00",
+          "require_feedback_score": 0,
+          "require_trade_volume": 0.0,
+          "msg": "Transfiero de inmediato y espero su pronta liberaci\u00f3n\n\nPOR FAVOR CUENTA Y CEDULA SIN PUNTOS, NI ESPACIO, NO COMAS. PARA AGILIZAR LA trasferencia. NOMBRE SIN ACENTOS\n\nsi no respondo es por qu\u00e9 todo el tiempo estoy transfiriendo deje su cuenta con datos bancarios.\n\nTrabajo fuera del local con montos altos solo acepto transferencia banesco con montos altos contacto solo whatssap +56 9 9452 5344",
+          "bank_name": "\u2705\u26a0\ufe0f BANESCO  \u26a0\ufe0f\u2705 rapido y seguro 10min\u23f0WS",
+          "atm_model": null,
+          "require_trusted_by_advertiser": false,
+          "require_identification": false,
+          "is_local_office": false,
+          "payment_window_minutes": 90,
+          "limit_to_fiat_amounts": null,
+          "is_low_risk": true
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/1201506"
+        }
+      },
+      {
+        "data": {
+          "profile": {
+            "username": "Stevenandersonv",
+            "trade_count": "3000+",
+            "feedback_score": 100,
+            "name": "Stevenandersonv (3000+; 100%)",
+            "last_online": "2020-12-07T17:37:45+00:00"
+          },
+          "visible": true,
+          "hidden_by_opening_hours": false,
+          "location_string": "Venezuela",
+          "countrycode": "VE",
+          "city": "",
+          "trade_type": "ONLINE_BUY",
+          "online_provider": "SPECIFIC_BANK",
+          "first_time_limit_btc": null,
+          "volume_coefficient_btc": "1.50",
+          "sms_verification_required": false,
+          "currency": "VES",
+          "lat": 0.0,
+          "lon": 0.0,
+          "min_amount": "3000000.00",
+          "max_amount": "668973234.00",
+          "max_amount_available": "668973234.00",
+          "ad_id": 570452,
+          "temp_price_usd": "19065.07",
+          "temp_price": "17800000000.00",
+          "created_at": "2017-10-06T10:49:53+00:00",
+          "require_feedback_score": 0,
+          "require_trade_volume": 0.0,
+          "msg": "Pago por PAGO MOVIL tambi\u00e9n..! importante: El pago no cubre el 0.3% de comisi\u00f3n.\n\n\u2605\u2605\u2605\u2605\u2605\u00a1Bienvenido! \u2605\u2605\u2605\u2605\u2605\n\nGracias por su Preferencia!\n\nSiempre estoy activo!\nSi me ves offline contactame v\u00eda Telegram @stevenanderson \u260e\n\nIMPORTANTE: POR FAVOR! SI NO LE RESPONDO AL MOMENTO ES PORQUE ESTOY REALIZANDO VARIAS TRANSFERENCIAS A SU VEZ.\n\nA los fines de acelerar su pago, por favor proporcione los datos para la transferencia sin encabezados, espacios, guiones, caracteres especiales o signos de puntuaci\u00f3n\n\nESPECIFICAR LOS SIGUIENTES DATOS:\n\n\u2714Nombre del banco:\n\u2714Titular:\n\u2714Cuenta:\n\u2714C\u00e9dula o Rif\n\nPaso 1.- (Oferte) Deje en en nuestro chat su cuenta bancaria!\nPaso 2.- (Ninguno) Yo le adjuntare el capture con la operaci\u00f3n 100% exitosa.\n\n\u2714 No olvide calificar \"DIGNO DE CONFIANZA\" y dejar un COMENTARIO sobre el intercambio.\n\n\u2714 Tambien realizo pagos de cuentas de terceros. Me reservo el derecho de transferir o (PAGAR) si no manda cancelar el comercio antes de realizar el pago\n\nFeliz D\u00eda.importante: El pago no cubre el 0.3% de comisi\u00f3n del (PagoMovil)",
+          "bank_name": "\u2582\u2583\u2585\u2586\u2587\u2588\u2593\u2592\u2705\u269c\ufe0f\u269c\ufe0f\u269c\ufe0fPROVINCIAL/PAGOMOVIL\u269c\ufe0f\u269c\ufe0f\u269c\ufe0f\u2705\u2592\u2593\u2588\u2587\u2586\u2585\u2583\u2582",
+          "atm_model": null,
+          "require_trusted_by_advertiser": false,
+          "require_identification": false,
+          "is_local_office": false,
+          "payment_window_minutes": 90,
+          "limit_to_fiat_amounts": "",
+          "is_low_risk": true
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/570452"
+        }
+      }
+    ],
+    "ad_count": 3
+  },
+  "pagination": {
+    "prev": "https://localbitcoins.com/sell-bitcoins-online/VES/.json?page=1"
+  }
+}

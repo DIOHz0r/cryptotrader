@@ -1,0 +1,67 @@
+{
+  "pagination": {
+    "next": "https://localbitcoins.com/buy-bitcoins-online/VES/.json?page=2"
+  },
+  "data": {
+    "ad_list": [
+      {
+        "data": {
+          "profile": {
+            "username": "foo_user",
+            "feedback_score": 100,
+            "trade_count": "3000+",
+            "last_online": "2020-09-06T20:38:36+00:00",
+            "name": "Foo (3000+; 100%)"
+          },
+          "bank_name": "BANCARIBE",
+          "temp_price": "3300000000.00",
+          "max_amount": "49660000",
+          "min_amount": "4480000",
+          "temp_price_usd": "9752.26"
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/1059181"
+        }
+      },
+      {
+        "data": {
+          "profile": {
+            "username": "bar_user",
+            "feedback_score": 100,
+            "trade_count": "10 000+",
+            "last_online": "2020-09-06T21:41:46+00:00",
+            "name": "Bar (100+; 100%)"
+          },
+          "bank_name": "♫BANCARIBE ♫ Leer Términos!",
+          "temp_price": "3840000000.00",
+          "max_amount": "773888999",
+          "min_amount": "2000000",
+          "temp_price_usd": "11348.09"
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/891604"
+        }
+      },
+      {
+        "data": {
+          "profile": {
+            "username": "FooBar",
+            "feedback_score": 98,
+            "trade_count": "10 000+",
+            "last_online": "2020-08-06T20:11:46+00:00",
+            "name": "FooBar (10 000+; 100%)"
+          },
+          "bank_name": "Provincial CORRIENTE!",
+          "temp_price": "4000000000.00",
+          "max_amount": "100000000",
+          "min_amount": "5000000",
+          "temp_price_usd": "11348.09"
+        },
+        "actions": {
+          "public_view": "https://localbitcoins.com/ad/984604"
+        }
+      }
+    ],
+    "ad_count": 3
+  }
+}

@@ -128,7 +128,7 @@ class LocalBtcClient implements CrawlerInterface
         if (!$contents) {
             return $dataRows;
         }
-        $amount = $options['amount'];
+        $amount = key_exists('amount', $options) ? $options['amount'] : null;
         foreach ($contents['data']['ad_list'] as $key => $ad) {
             $mark = ' ';
             $skip = true;
@@ -141,7 +141,7 @@ class LocalBtcClient implements CrawlerInterface
                 $skip = false;
             }
             $matchBankname = str_replace(' ', '', $bankName);
-            if (stripos($matchBankname, $options['bank']) !== false) {
+            if (key_exists('bank', $options) && stripos($matchBankname, $options['bank']) !== false) {
                 $mark .= '<fg=cyan>+</>';
             }
             $row = [
