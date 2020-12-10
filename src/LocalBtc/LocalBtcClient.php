@@ -122,13 +122,46 @@ class LocalBtcClient implements CrawlerInterface
      */
     public function listAds($queryUrl, array $options): array
     {
-        $response = $this->httpClient->get($queryUrl);
-        $contents = json_decode($response->getBody()->getContents(), true);
         $dataRows = [];
+        $contents = $this->getApiResponse($queryUrl);
         if (!$contents) {
             return $dataRows;
         }
-        $amount = key_exists('amount', $options) ? $options['amount'] : null;
+        $amount = $this->getAmount($options);
+        $dataRows = $this->parseAds($contents, $amount, $options, $dataRows);
+
+        return $dataRows;
+    }
+
+    /**
+     * @param $queryUrl
+     * @return array|null
+     */
+    protected function getApiResponse($queryUrl): ?array
+    {
+        $response = $this->httpClient->get($queryUrl);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * @param array $options
+     * @return mixed|null
+     */
+    protected function getAmount(array $options)
+    {
+        return key_exists('amount', $options) ? $options['amount'] : null;
+    }
+
+    /**
+     * @param $contents
+     * @param $amount
+     * @param array $options
+     * @param array $dataRows
+     * @return array
+     */
+    protected function parseAds(iterable $contents, $amount, array $options, array $dataRows): array
+    {
         foreach ($contents['data']['ad_list'] as $key => $ad) {
             $mark = ' ';
             $skip = true;
@@ -136,12 +169,14 @@ class LocalBtcClient implements CrawlerInterface
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $data['bank_name']);
             $minAmount = (float)$data['min_amount'];
             $maxAmount = (float)$data['max_amount'];
-            if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
+            if ($this->amountInRange($amount, $minAmount, $maxAmount)) {
                 $mark .= '<info>$</info>';
                 $skip = false;
             }
-            $matchBankname = str_replace(' ', '', $bankName);
-            if (key_exists('bank', $options) && stripos($matchBankname, $options['bank']) !== false) {
+            if ($this->excludeAd($skip, $options)) {
+                continue;
+            }
+            if ($this->bankMatched($options, $bankName)) {
                 $mark .= '<fg=cyan>+</>';
             }
             $row = [
@@ -151,14 +186,66 @@ class LocalBtcClient implements CrawlerInterface
                 $maxAmount,
                 $ad['actions']['public_view'].$mark,
             ];
-            if (isset($options['username']) && $options['username']) {
+            if ($this->showUser($options)) {
                 $row[] = $data['profile']['name'];
-            }
-            if ($skip && isset($options['exclude']) && $options['exclude']) {
-                continue;
             }
             $dataRows[] = $row;
         }
+        $dataRows = $this->getNextPage($contents, $dataRows, $options);
+
+        return $dataRows;
+    }
+
+    /**
+     * @param $amount
+     * @param float $minAmount
+     * @param float $maxAmount
+     * @return bool
+     */
+    protected function amountInRange($amount, float $minAmount, float $maxAmount): bool
+    {
+        return $amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount);
+    }
+
+    /**
+     * @param array $options
+     * @param string $matchBankname
+     * @return bool
+     */
+    protected function bankMatched(array $options, $matchBankname): bool
+    {
+        $matchBankname = str_replace(' ', '', $matchBankname);
+
+        return key_exists('bank', $options) && stripos($matchBankname, $options['bank']) !== false;
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function showUser(array $options): bool
+    {
+        return isset($options['username']) && $options['username'];
+    }
+
+    /**
+     * @param bool $skip
+     * @param array $options
+     * @return bool
+     */
+    protected function excludeAd(bool $skip, array $options): bool
+    {
+        return $skip && isset($options['exclude']) && $options['exclude'];
+    }
+
+    /**
+     * @param iterable $contents
+     * @param array $dataRows
+     * @param array $options
+     * @return array
+     */
+    protected function getNextPage(iterable $contents, array $dataRows, array $options): array
+    {
         if (isset($contents['pagination']['next'])) {
             $dataRows = array_merge($dataRows, $this->listAds($contents['pagination']['next'], $options));
         }

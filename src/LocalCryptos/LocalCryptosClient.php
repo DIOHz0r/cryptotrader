@@ -122,28 +122,106 @@ class LocalCryptosClient implements CrawlerInterface
      */
     public function listAds($queryUrl, array $options): array
     {
-        $response = $this->httpClient->get($queryUrl);
-        $contents = json_decode($response->getBody()->getContents(), true);
         $dataRows = [];
+        $contents = $this->getApiResponse($queryUrl);
         if (!$contents) {
             return $dataRows;
         }
-        $amount = key_exists('amount', $options) ? $options['amount'] : null;
+        $amount = $this->getAmount($options);
+        $dataRows = $this->parseAds($contents, $options, $amount, $dataRows, $queryUrl);
+
+        return $dataRows;
+    }
+
+    /**
+     * @param $queryUrl
+     * @return mixed
+     */
+    protected function getApiResponse($queryUrl): ?array
+    {
+        $response = $this->httpClient->get($queryUrl);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * @param array $options
+     * @return mixed|null
+     */
+    protected function getAmount(array $options)
+    {
+        return key_exists('amount', $options) ? $options['amount'] : null;
+    }
+
+    /**
+     * @param $amount
+     * @param float $minAmount
+     * @param float $maxAmount
+     * @return bool
+     */
+    protected function amountInRage($amount, float $minAmount, float $maxAmount): bool
+    {
+        return $amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount);
+    }
+
+    /**
+     * @param array $options
+     * @param string $matchBankname
+     * @return bool
+     */
+    protected function bankMatched(array $options, $matchBankname): bool
+    {
+        $matchBankname = str_replace(' ', '', $matchBankname);
+
+        return key_exists('bank', $options) && stripos($matchBankname, $options['bank']) !== false;
+    }
+
+    /**
+     * @param bool $skip
+     * @param array $options
+     * @return bool
+     */
+    protected function excludeAd(bool $skip, array $options): bool
+    {
+        return $skip && isset($options['exclude']) && $options['exclude'];
+    }
+
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function showUser(array $options): bool
+    {
+        return isset($options['username']) && $options['username'];
+    }
+
+    /**
+     * @param $contents
+     * @param array $options
+     * @param $amount
+     * @param array $dataRows
+     * @param $queryUrl
+     * @return array
+     */
+    protected function parseAds($contents, array $options, $amount, array $dataRows, $queryUrl): array
+    {
         foreach ($contents['offers'] as $key => $ad) {
             $mark = ' ';
             $skip = true;
-            if ($options['currency'] != '' && $options['currency'] != $ad['local_currency_code']) {
+            if ($this->filterCurrency($options['currency'], $ad['local_currency_code'])) {
                 continue;
             }
             $bankName = preg_replace('/[^\x{20}-\x{7F}]/u', '', $ad['headline']);
             $minAmount = (float)$ad['limits_minimum'];
             $maxAmount = (float)$ad['limits_maximum'];
-            if ($amount && ($minAmount <= $amount && $maxAmount == 0 || $minAmount <= $amount && $amount <= $maxAmount)) {
+            if ($this->amountInRage($amount, $minAmount, $maxAmount)) {
                 $mark .= '<info>$</info>';
                 $skip = false;
             }
-            $matchBankname = str_replace(' ', '', $bankName);
-            if (key_exists('bank', $options) && stripos($matchBankname, $options['bank']) !== false) {
+            if ($this->excludeAd($skip, $options)) {
+                continue;
+            }
+            if ($this->bankMatched($options, $bankName)) {
                 $mark .= '<fg=cyan>+</>';
             }
             $row = [
@@ -153,25 +231,58 @@ class LocalCryptosClient implements CrawlerInterface
                 $maxAmount,
                 'https://localcryptos.com/offer/'.$ad['id'].$mark,
             ];
-            if (isset($options['username']) && $options['username']) {
+            if ($this->showUser($options)) {
                 $row[] = $ad['account_username'].' ('.$ad['account_intro'].')';
             }
             $row['local_currency_code'] = $ad['local_currency_code'];
             $row['country_code'] = $ad['city']['country_code'];
-            if ($skip && isset($options['exclude']) && $options['exclude']) {
-                continue;
-            }
             $dataRows[] = $row;
         }
-        if (!is_null($contents['next'])) {
-            if (preg_match('/&after=(\d+)/i', $queryUrl, $regs)) {
-                $queryUrl = str_replace($regs[1], $contents['next'], $queryUrl);
-            } else {
-                $queryUrl .= "&after=".$contents['next'];
-            }
+        $dataRows = $this->getNextPage($contents['next'], $queryUrl, $dataRows, $options);
+
+        return $dataRows;
+    }
+
+    /**
+     * @param $currency
+     * @param $ad
+     * @return bool
+     */
+    protected function filterCurrency($currency, $ad): bool
+    {
+        return $currency != '' && $currency != $ad;
+    }
+
+    /**
+     * @param $contents
+     * @param $queryUrl
+     * @param array $dataRows
+     * @param array $options
+     * @return array
+     */
+    protected function getNextPage($contents, $queryUrl, array $dataRows, array $options): array
+    {
+        if (!is_null($contents)) {
+            $queryUrl = $this->getQueryUrl($queryUrl, $contents);
             $dataRows = array_merge($dataRows, $this->listAds($queryUrl, $options));
         }
 
         return $dataRows;
+    }
+
+    /**
+     * @param $queryUrl
+     * @param $contents
+     * @return string
+     */
+    protected function getQueryUrl($queryUrl, $contents): string
+    {
+        if (preg_match('/&after=(\d+)/i', $queryUrl, $regs)) {
+            $queryUrl = str_replace($regs[1], $contents, $queryUrl);
+        } else {
+            $queryUrl .= "&after=".$contents;
+        }
+
+        return $queryUrl;
     }
 }
