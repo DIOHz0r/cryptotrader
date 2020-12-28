@@ -18,7 +18,7 @@ trait DataRowsTrait
      * @param $top
      * @return array
      */
-    protected function sortDataRows(
+    public function sortDataRows(
         array $dataRows,
         int $priceCol,
         int $minCol,
@@ -31,7 +31,7 @@ trait DataRowsTrait
         $maximun = array_column($dataRows, $maxCol);
         array_multisort(
             $price,
-            $min_max_sort['price_sort'],
+            $min_max_sort,
             $minimun,
             $min_max_sort,
             $maximun,

@@ -28,7 +28,7 @@ trait LocalBtcProcessAdsTrait
      * @param array $sort
      * @return array
      */
-    protected function processDataRows(
+    public function processDataRows(
         array $dataRows,
         $top,
         $currency,

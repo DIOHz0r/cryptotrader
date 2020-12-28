@@ -58,7 +58,7 @@ trait LocalCryptosProcessAdsTrait
      * @param array $sort
      * @return array
      */
-    protected function processDataRows(
+    public function processDataRows(
         array $dataRows,
         $top,
         $sort = ['price_sort' => SORT_ASC, 'min_max_sort' => SORT_DESC]
