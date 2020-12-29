@@ -1,22 +1,27 @@
 language: php
+php:
+  - '7.1'
+  - '7.2'
+  - '7.3'
+  - '7.4'
+  - '8.0'
 
-sudo: required
+git:
+  depth: 2
 
 env:
   global:
-    - CS=7.1
+    - CS='7.1'
 
-php:
-  - 7.1
-  - 7.2
-  - 7.3
-  - 7.4
-  - 8.0
+matrix:
+  allow_failures:
+    - php: '8.0'
 
 script:
   - if [ "${TRAVIS_PHP_VERSION:0:3}" = "$CS" ]; then COVERAGE='--coverage-text' ; else COVERAGE='--no-coverage'; fi
+  - rm composer.lock symfony.lock
   - composer install
-  - bin/phpunit
+  - bin/phpunit $COVERAGE
 
 cache:
   directories:
