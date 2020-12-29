@@ -1,0 +1,23 @@
+language: php
+
+sudo: required
+
+env:
+  global:
+    - CS=7.1
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+  - 8.0
+
+script:
+  - if [ "${TRAVIS_PHP_VERSION:0:3}" = "$CS" ]; then COVERAGE='--coverage-text' ; else COVERAGE='--no-coverage'; fi
+  - composer install
+  - bin/phpunit
+
+cache:
+  directories:
+    - $HOME/.composer/cache
