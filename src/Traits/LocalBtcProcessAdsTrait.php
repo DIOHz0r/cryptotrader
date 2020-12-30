@@ -37,7 +37,7 @@ trait LocalBtcProcessAdsTrait
         $dataRows = $this->sortDataRows($dataRows, $this->tableColums['price'], $this->tableColums['min'],
             $this->tableColums['max'], $sort['min_max_sort'], $top);
         $finalData = [];
-        $fmt = new \NumberFormatter($currency, \NumberFormatter::CURRENCY);
+        $fmt = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
         foreach ($dataRows as $key => $row) {
             foreach ($this->tableColums as $colName => $colNumber) {
                 $row[$colNumber] = $fmt->formatCurrency($row[$colNumber], $currency);

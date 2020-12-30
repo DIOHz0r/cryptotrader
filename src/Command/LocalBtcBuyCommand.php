@@ -23,8 +23,8 @@ namespace App\Command;
 use App\HttpClient\CrawlerInterface;
 use App\LocalBtc\LocalBtcClient;
 use App\Traits\LocalBtcProcessAdsTrait;
+use App\Traits\RenderAdsTable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,6 +34,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LocalBtcBuyCommand extends Command
 {
     use LocalBtcProcessAdsTrait;
+    use RenderAdsTable;
 
     protected static $defaultName = 'localbtc:buy:online';
 
@@ -46,6 +47,8 @@ class LocalBtcBuyCommand extends Command
      * @var string field to search by default
      */
     protected $defaultFields = 'profile,temp_price,min_amount,max_amount,bank_name,temp_price_usd';
+    /** @var RenderAdsTable */
+    private $renderAdsTable;
 
 
     public function __construct(CrawlerInterface $localBtcClient)
@@ -110,22 +113,7 @@ class LocalBtcBuyCommand extends Command
         );
 
         // Print the result
-        $format = $input->getOption('json');
-        if ($format) {
-            $output->write(json_encode($dataRows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-
-            return 0;
-        }
-
-        $table = new Table($output);
-        $headers = ['payment', 'price', 'min', 'max'];
-        if ($options['username']) {
-            $headers[] = 'user';
-        }
-        $table->setHeaders($headers)->setRows($dataRows);
-        $table->render();
-
-        return 0;
+        return $this->renderAdsTable($input, $output, $dataRows, $options);
     }
 
 }

@@ -23,8 +23,8 @@ namespace App\Command;
 use App\HttpClient\CrawlerInterface;
 use App\LocalBtc\LocalBtcClient;
 use App\Traits\LocalBtcProcessAdsTrait;
+use App\Traits\RenderAdsTable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,6 +34,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LocalBtcSellCommand extends Command
 {
     use LocalBtcProcessAdsTrait;
+    use RenderAdsTable;
 
     protected static $defaultName = 'localbtc:sell:online';
 
@@ -105,22 +106,7 @@ class LocalBtcSellCommand extends Command
         $dataRows = $this->processDataRows($dataRows, $top, $currency);
 
         // Print the result
-        $format = $input->getOption('json');
-        if ($format) {
-            $output->write(json_encode($dataRows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-
-            return 0;
-        }
-
-        $table = new Table($output);
-        $headers = ['payment', 'price', 'min', 'max'];
-        if ($options['username']) {
-            $headers[] = 'user';
-        }
-        $table->setHeaders($headers)->setRows($dataRows);
-        $table->render();
-
-        return 0;
+        return $this->renderAdsTable($input, $output, $dataRows, $options);
     }
 
 }

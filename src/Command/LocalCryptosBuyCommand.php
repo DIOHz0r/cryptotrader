@@ -23,8 +23,8 @@ namespace App\Command;
 use App\HttpClient\CrawlerInterface;
 use App\LocalCryptos\LocalCryptosClient;
 use App\Traits\LocalCryptosProcessAdsTrait;
+use App\Traits\RenderAdsTable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LocalCryptosBuyCommand extends Command
 {
     use LocalCryptosProcessAdsTrait;
+    use RenderAdsTable;
 
     protected static $defaultName = 'lc:buy:online';
 
@@ -111,21 +112,6 @@ class LocalCryptosBuyCommand extends Command
         );
 
         // Print the result
-        $format = $input->getOption('json');
-        if ($format) {
-            $output->write(json_encode($dataRows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-
-            return 0;
-        }
-
-        $table = new Table($output);
-        $headers = ['payment', 'price', 'min', 'max'];
-        if ($options['username']) {
-            $headers[] = 'user';
-        }
-        $table->setHeaders($headers)->setRows($dataRows);
-        $table->render();
-
-        return 0;
+        return $this->renderAdsTable($input, $output, $dataRows, $options);
     }
 }
