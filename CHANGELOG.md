@@ -1,5 +1,9 @@
 # Changelog
 
+#### [0.3.0](https://github.com/DIOHz0r/cryptotrader/tree/0.3.0) (2021-01-04)
+
+ * feat: add DASH support on localcryptos ([7d64cd4](https://github.com/DIOHz0r/cryptotrader/commit/7d64cd4))
+
 #### [0.2.0](https://github.com/DIOHz0r/cryptotrader/tree/0.2.0) (2020-09-15)
 
  * feature: change localeth to localcryptos ([1e16405](https://github.com/DIOHz0r/cryptotrader/commit/1e16405))
