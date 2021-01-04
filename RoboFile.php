@@ -1,4 +1,7 @@
 <?php
+
+use Robo\Exception\AbortTasksException;
+
 /**
  * cryptotrader
  * Copyright (C) 2018 Domingo Oropeza
@@ -23,21 +26,11 @@ class RoboFile extends \Robo\Tasks
     /**
      * @var string
      */
-    var $version = '0.0.0';
     var $newVersion;
     var $releaseType = 'patch';
 
 
     var $options = [];
-
-    /**
-     * regex pattern of the version in composer.json file
-     * @return string
-     */
-    public static function getVersionPattern()
-    {
-        return '"version": "([^,]*)",';
-    }
 
     /**
      * Task to create the changelog of the project
@@ -47,36 +40,16 @@ class RoboFile extends \Robo\Tasks
      */
     public function makeChangelog($repository)
     {
-        $repoPrefix = 'upstream/';
-        $parentRevision = 'master';
-        $currentRevision = 'develop';
-
         $changelog = $this->taskChangelog();
-        $lastTag = $this->taskGitStack()->printOutput(FALSE)
-            ->exec('describe --abbrev=0 --tags')->run()->getMessage();
-        if ($lastTag) {
-            // if tags exist check against the last one
-            $parentRevision = 'tags/' . trim($lastTag);
-        } else {
-            $fromHash = $this->taskGitStack()->printOutput(FALSE)
-                ->exec("ls-remote upstream $parentRevision")->run()->getMessage();
-            $fromHash = str_replace("\trefs/heads/master", '', $fromHash);
-            if (!$fromHash) {
-                // master branch does not exist, let's go against first parent as first time ever revision check
-                $message = $this->taskGitStack()->printOutput(FALSE)
-                    ->exec("rev-list --max-parents=0 HEAD")->run()->getMessage();
-                $parentRevision = trim($message);
-                $currentRevision = 'HEAD';
-            }
-        }
+
+        list($parentRevision, $currentRevision) = $this->getParentAndCurrentRevision();
 
         $this->stopOnFail(true);
-        $command = 'log --pretty=" * %s ([%h](https://github.com/' . $repository . '/commit/%h))"  ' . $parentRevision . '..' . $currentRevision . ' --grep="^fix" --grep="^feat" --grep="^perf"';
-        $result = $this->taskGitStack()->printOutput(FALSE)->exec($command)->run()->getMessage();
-        if (empty($result)) {
+        $changes = $this->getGitChangeLog($repository, $parentRevision, $currentRevision);
+        if (empty($changes)) {
             return Robo\Result::cancelled('No new commits for release an update');
         }
-        if (preg_match('/(BREAKING CHANGE:)|(^ \* feat)/m', $result, $regs)) {
+        if (preg_match('/(BREAKING CHANGE:)|(^ \* feat)/m', $changes, $regs)) {
             switch ($regs[0]) {
                 case 'BREAKING CHANGE:':
                     $this->releaseType = 'major';
@@ -87,13 +60,26 @@ class RoboFile extends \Robo\Tasks
                 // by default is patch
             }
         }
-        $this->setVersionFromComposer('composer.json');
-        $newVersion = $this->newVersion = $this->generateNextVersion($this->version);
-        $result = ($result) ? $result : ' * Minor changes, for more details see our [commit history](https://github.com/' . $repository . '/compare/master...' . $newVersion . '/bugfixes)';
+        $newVersion = $this->newVersion = $this->generateNextVersion(
+            $this->setVersionFromLastRevision($parentRevision)
+        );
+        $changes = ($changes) ? $changes : ' * Minor changes, for more details see our [commit history](https://github.com/'.$repository.'/compare/master...'.$newVersion.'/bugfixes)';
+
         return $changelog->filename('CHANGELOG.md')
-            ->version("[" . $newVersion . "](https://github.com/$repository/tree/" . $newVersion . ") (" . date('Y-m-d') . ")")
-            ->setBody($result)
+            ->version("[".$newVersion."](https://github.com/$repository/tree/".$newVersion.") (".date('Y-m-d').")")
+            ->setBody($changes)
             ->run();
+    }
+
+    /**
+     * @param $revision
+     * @return string
+     */
+    private function setVersionFromLastRevision($revision)
+    {
+        $version = strstr($revision, '/');
+
+        return ($version !== false) ? ltrim($version, '/') : '0.0.0';
     }
 
     /**
@@ -119,17 +105,15 @@ class RoboFile extends \Robo\Tasks
         }
 
         $newVersion = $this->newVersion;
-        $releaseBranch = 'release/' . $newVersion;
+        $releaseBranch = 'release/'.$newVersion;
 
         // git-flow start
-        $this->taskGitStack()->checkout('-b ' . $releaseBranch)->run();
+        $this->taskGitStack()->checkout('-b '.$releaseBranch)->run();
 
         // Continue the git flow
         $filename = 'CHANGELOG.md';
         $commitMessage = 'docs: updated project files for new release.';
-        $composerFile = 'composer.json';
-        $this->composerUpdate($composerFile);
-        $this->taskGitStack()->add($filename)->add($composerFile)
+        $this->taskGitStack()->add($filename)
             ->commit($commitMessage)
             ->checkout('-b robo-master upstream/master')
             ->merge($releaseBranch)->tag($newVersion)
@@ -137,7 +121,7 @@ class RoboFile extends \Robo\Tasks
             ->run();
 
         // finish git-flow with delete release branch
-        $this->taskGitStack()->exec('branch -D ' . $releaseBranch)->run();
+        $this->taskGitStack()->exec('branch -D '.$releaseBranch)->run();
 
         // make changelog for gh-pages
         // $this->taskGitStack()->checkout('-b robo-gh-pages upstream/gh-pages')->checkout('robo-develop ' . $filename)->run();
@@ -156,27 +140,6 @@ class RoboFile extends \Robo\Tasks
     }
 
     /**
-     * @param string $composerFile
-     */
-    private function composerUpdate($composerFile)
-    {
-        $fileContent = $this->getComposerContent($composerFile);
-        $pattern = self::getVersionPattern();
-        if (!preg_match('/' . $pattern . '/', $fileContent)) {
-            // composer.json doesn't have the version string, let's add it
-            $fileDecoded = json_decode($fileContent, true);
-            $fileDecoded = ['version' => $this->version] + $fileDecoded;
-            $fileContent = json_encode($fileDecoded, JSON_PRETTY_PRINT);
-        }
-        $fileContent = preg_replace(
-            '/' . $pattern . '/',
-            '"version": "' . $this->newVersion . '",',
-            $fileContent
-        );
-        file_put_contents($composerFile, $fileContent);
-    }
-
-    /**
      * Generate the next semantic version
      * @param $currentVersion
      * @return string
@@ -192,22 +155,22 @@ class RoboFile extends \Robo\Tasks
         $validTypes = ['patch', 'minor', 'major'];
         if (!in_array($type, $validTypes)) {
             throw new \InvalidArgumentException(
-                'The option [type] must be one of: {' . implode(
+                'The option [type] must be one of: {'.implode(
                     $validTypes,
                     ', '
-                ) . "}, \"$type\" given"
+                )."}, \"$type\" given"
             );
         }
 
         $versionRegex = '(?:(\d+\.\d+\.\d+)(?:(-)([a-zA-Z]+)(\d+)?)?)';
-        if (!preg_match('#^' . $versionRegex . '$#', $currentVersion)) {
+        if (!preg_match('#^'.$versionRegex.'$#', $currentVersion)) {
             throw new \Exception(
-                'Current version format is invalid (' . $currentVersion . '). It should be major.minor.patch'
+                'Current version format is invalid ('.$currentVersion.'). It should be major.minor.patch'
             );
         }
 
         $matches = null;
-        preg_match('$' . $versionRegex . '$', $currentVersion, $matches);
+        preg_match('$'.$versionRegex.'$', $currentVersion, $matches);
         // if last version is with label
         if (count($matches) > 3) {
             list($major, $minor, $patch) = explode('.', $currentVersion);
@@ -231,7 +194,7 @@ class RoboFile extends \Robo\Tasks
                     }
                 }
 
-                return implode([$major, $minor, $patch], '.') . '-' . $label . $labelVersion;
+                return implode([$major, $minor, $patch], '.').'-'.$label.$labelVersion;
             }
 
             return implode([$major, $minor, $patch], '.');
@@ -255,34 +218,57 @@ class RoboFile extends \Robo\Tasks
 
         // new label
         if ($label != 'none') {
-            return implode([$major, $minor, $patch], '.') . '-' . $label;
+            return implode([$major, $minor, $patch], '.').'-'.$label;
         }
 
         return implode([$major, $minor, $patch], '.');
     }
 
     /**
-     * @param string $composerFile
+     * @return array
+     * @throws AbortTasksException
      */
-    private function setVersionFromComposer($composerFile)
+    private function getParentAndCurrentRevision(): array
     {
-        $fileContent = $this->getComposerContent($composerFile);
-        if (preg_match('/' . self::getVersionPattern() . '/', $fileContent, $regs)) {
-            $this->version = $regs[1];
+        $parentRevision = 'master';
+        $currentRevision = 'develop';
+        if (!$this->taskGitStack()->printOutput(false)->exec('remote get-url upstream')->run()->getMessage()) {
+            throw new AbortTasksException('Upstream branch is not defined');
         }
+        $this->taskGitStack()->exec('fetch --all -t')->run();
+        $lastTag = $this->taskGitStack()->printOutput(false)->exec('describe --abbrev=0 --tags')
+            ->run()->getMessage();
+        if ($lastTag) {
+            // if tags exist check against the last one
+            $parentRevision = 'tags/'.trim($lastTag);
+        } else {
+            $fromHash = $this->taskGitStack()->printOutput(false)
+                ->exec("ls-remote upstream $parentRevision")->run()->getMessage();
+            $fromHash = str_replace("\trefs/heads/master", '', $fromHash);
+            if (!$fromHash) {
+                // master branch does not exist, let's go against first parent as first time ever revision check
+                $message = $this->taskGitStack()->printOutput(false)
+                    ->exec("rev-list --max-parents=0 HEAD")->run()->getMessage();
+                $parentRevision = trim($message);
+                $currentRevision = 'HEAD';
+            }
+        }
+
+        return array($parentRevision, $currentRevision);
     }
 
     /**
-     * @param string $composerFile
-     * @return bool|string
+     * @param string $repository
+     * @param $parentRevision
+     * @param $currentRevision
+     * @return string
      */
-    private function getComposerContent($composerFile)
+    private function getGitChangeLog(string $repository, $parentRevision, $currentRevision): string
     {
-        if (!file_exists($composerFile)) {
-            throw new \RuntimeException("Impossible to find the composer file ($composerFile)");
-        }
-        $fileContent = file_get_contents($composerFile);
+        $command = 'log --pretty=" * %s ([%h](https://github.com/'.$repository.'/commit/%h))"  '.$parentRevision.'..'.$currentRevision.' --grep="^fix" --grep="^feat" --grep="^perf"';
+        $result = $this->taskGitStack()->printOutput(false)->exec($command)->run()->getMessage();
 
-        return $fileContent;
+        return $result;
     }
+
 }
